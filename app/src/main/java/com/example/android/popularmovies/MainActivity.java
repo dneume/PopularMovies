@@ -11,10 +11,16 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
-import static com.example.android.popularmovies.Utils.getResponseFromHttpUrl;
+import static com.example.android.popularmovies.Utils.buildUrlForDetail;
 import static java.lang.Boolean.FALSE;
 
 
@@ -25,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Item
     private Context context;
     public TextView mSearchResultsTextView;
 
+    public static List<MovieDetail> movies;
 
     public class MovieDbQueryTask extends AsyncTask<URL, Void, String> {
 
@@ -39,9 +46,16 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Item
         protected String doInBackground(URL... params) {
             URL searchUrl = params[0];
             String movieDbResults = null;
+            URL detailUrl;
 
             try {
                 movieDbResults = getResponseFromHttpUrl(searchUrl);
+                for (int i = 0; i < movies.size(); i++) {
+                    //Log.d("array list: ", movies.get(i).movie_id);
+                    detailUrl = buildUrlForDetail(movies.get(i).movie_id);
+                    getMovieDetail(detailUrl,i);
+                }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -50,9 +64,12 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Item
 
         @Override
         protected void onPostExecute(String movieDbResults) {
-            Log.d("onPostExecute",movieDbResults);
+            Log.d("array size: ", String.valueOf(movies.size()));
+            for (int i = 0; i < movies.size(); i++) {
+                Log.d("array list ", movies.get(i).movie_original_title);
+                Log.d("array list ", movies.get(i).movie_overview);
+            }
             showJsonDataView();
-            Log.d("Post show JsonData","Post show JsonData");
             mSearchResultsTextView.setText(movieDbResults);
             Log.d("onPost show JsonData","getting ready to exit");
         }
@@ -101,11 +118,19 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Item
         }
 
         url = Utils.buildUrl();
+        // create the an arraylist of the moviedetail based on the id from the moviedb
+        movies = new ArrayList<MovieDetail>();
 
         //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
-        Log.d("1 process",url.toString());
+        //Log.d("1 process",url.toString());
         new MovieDbQueryTask().execute(url);
-        Log.d("2 process",url.toString());
+
+        // check to make sure the ids are stored properly
+//        Log.d("array size: ", String.valueOf(movies.size()));
+//        for (int i = 0; i < movies.size(); i++) {
+//            Log.d("array list: ", movies.get(i).movie_id);
+//        }
+
 
         recyclerView_Adapter = new ImageAdapter(context, data);
         if (recyclerView_Adapter != null) {
@@ -128,6 +153,125 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Item
             finish();
         }
 
+    }
+
+    public static String getResponseFromHttpUrl(URL url) throws IOException {
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        String local_input = null;
+        int index = 0;
+        MovieDetail mMovieDetail;
+
+        try {
+            InputStream in = urlConnection.getInputStream();
+
+            //scanner for the id
+            Scanner scanner = new Scanner(in);
+            scanner.useDelimiter("\"id\":");
+            boolean hasInput = scanner.hasNext();
+            local_input = scanner.next();
+
+            while (hasInput) {
+
+                local_input = scanner.next();
+                index = local_input.indexOf(",");
+                if (index > 0) {
+                    String local_id = local_input.substring(0, index);
+                    mMovieDetail = new MovieDetail(local_id);
+                    movies.add(mMovieDetail);
+                }
+                hasInput = scanner.hasNext();
+
+            }
+            return local_input;
+
+        } finally {
+            urlConnection.disconnect();
+        }
+    }
+
+    public boolean getMovieDetail(URL url, int i){
+
+        HttpURLConnection urlConnection = null;
+        String local_input = null;
+        String copy_of_local_input = null;
+        int index = 0;
+        Scanner[] scanner;
+        MovieDetail mMovieDetail = new MovieDetail("1");
+
+        try {
+            urlConnection = (HttpURLConnection) url.openConnection();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            mMovieDetail.movie_id = movies.get(i).movie_id;
+
+            InputStream in = urlConnection.getInputStream();
+            local_input = readStream(in);
+            copy_of_local_input = local_input;
+
+            String original_title = scanInput("original_title\":\"", local_input);
+            local_input = copy_of_local_input;
+             mMovieDetail.movie_original_title = original_title;
+
+            String poster_path = scanInput("poster_path\":\"", local_input);
+            local_input = copy_of_local_input;
+            mMovieDetail.movie_thumbnail_path = poster_path;
+
+            String overview = scanInput("overview\":\"", local_input);
+            local_input = copy_of_local_input;
+            mMovieDetail.movie_overview = overview;
+
+            String vote_average = scanInput("vote_average\":", local_input);
+            local_input = copy_of_local_input;
+            mMovieDetail.move_user_rating = vote_average;
+
+            String release_date = scanInput("release_date\":\"", local_input);
+            local_input = copy_of_local_input;
+            mMovieDetail.release_date = release_date;
+            //Log.d("end of detail"," ");
+
+            movies.add(mMovieDetail);
+            movies.remove(i);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            urlConnection.disconnect();
+        }
+        return true;
+    }
+    private String scanInput(String delimiter, String input) {
+        int index = 0;
+        String local_id = null;
+        Scanner scanner = new Scanner(input);
+        scanner.useDelimiter(delimiter);
+        boolean hasInput = scanner.hasNext();
+        input = scanner.next();
+        input = scanner.next();
+        if(hasInput){
+            index = input.indexOf("\",");
+            if (index > 0) {
+                local_id = input.substring(0, index);
+                //Log.d(delimiter, local_id);
+            }
+        }
+        return local_id;
+    }
+
+    private String readStream(InputStream is) {
+        try {
+            ByteArrayOutputStream bo = new ByteArrayOutputStream();
+            int i = is.read();
+            while(i != -1) {
+                bo.write(i);
+                i = is.read();
+            }
+            return bo.toString();
+        } catch (IOException e) {
+            return "";
+        }
     }
 
 }
