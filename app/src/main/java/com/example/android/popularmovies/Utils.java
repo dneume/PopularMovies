@@ -8,12 +8,14 @@ import static android.content.Context.CONNECTIVITY_SERVICE;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
+import java.io.ByteArrayOutputStream;
 import java.net.MalformedURLException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.IOException;
 import android.net.Uri;
 import android.util.Log;
+import android.view.ViewDebug;
 
 import java.io.InputStream;
 import java.util.Scanner;
@@ -25,12 +27,16 @@ import java.util.Scanner;
 public class Utils {
 
     final static String BASE_URL =
-            "http://api.themoviedb.org/3/discover/movie/";
-    final static String KEY_ID1 = "sort_by";
-    final static String PARAM_POPULAR = "popularity.desc";
-    final static String KEY_ID2 = "api_key";
+            "http://api.themoviedb.org/3/movie/";
+    final static String KEY_SORT = "sort_by";
+    final static String PARAM_POPULAR = "popular";
+    final static String KEY_API = "api_key";
     final static String PARAM_API_KEY = "78891bb3d2c1b1ee69109f6f46b23ead";
-
+    final static String KEY_LANG = "LANGUAGE";
+    final static String PARAM_LANG = "en-US";
+    final static String KEY_PAGE = "page";
+    final static String PARAM_PAGE = "2";
+    // https://api.themoviedb.org/3/movie/popular?api_key=<<api_key>>&language=en-US&page=1
 
     public void Utils() {
 
@@ -42,58 +48,90 @@ public class Utils {
 
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        if(activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting()) {
+        if (activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting()) {
             return Network_is_available;
-        }
-        else
-        {
+        } else {
             return Network_is_not_available;
         }
 
     }
 
-
-    public static URL buildUrl(){
+    public static URL buildUrl() {
         URL url = null;
         Uri.Builder uriBuilder = null;
         Uri uri;
 
         uri = Uri.parse(BASE_URL);
         uriBuilder = uri.buildUpon();
-        uriBuilder.appendQueryParameter(KEY_ID1, PARAM_POPULAR);
-        uriBuilder.appendQueryParameter(KEY_ID2, PARAM_API_KEY);
+        uriBuilder.appendPath(PARAM_POPULAR);
+        uriBuilder.appendQueryParameter(KEY_API, PARAM_API_KEY);
+        uriBuilder.appendQueryParameter(KEY_LANG, PARAM_LANG);
+        uriBuilder.appendQueryParameter(KEY_PAGE, PARAM_PAGE);
         uri = uriBuilder.build();
 
         String local = uriBuilder.toString();
 
-        try{
+        Log.d("buildUrl: ", local);
+
+        try {
             url = new URL(uri.toString());
-        }
-        catch (MalformedURLException e) {
+        } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        Log.d("build url", local);
+//        Log.d("build url", local);
+        return url;
+    }
+    public static URL buildUrlForDetail(String movie_id) {
+        URL url = null;
+        Uri.Builder uriBuilder = null;
+        Uri uri;
+
+        uri = Uri.parse(BASE_URL);
+        uriBuilder = uri.buildUpon();
+        uriBuilder.appendPath(movie_id);
+        uriBuilder.appendQueryParameter(KEY_API, PARAM_API_KEY);
+        uri = uriBuilder.build();
+
+        String local = uriBuilder.toString();
+
+        try {
+            url = new URL(uri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        Log.d("detail url", local);
         return url;
     }
 
-    public static String getResponseFromHttpUrl(URL url) throws IOException {
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
+    // read the http input stream into a buffer so that the buffer can be used by multiple scanners
+    public static String readStream(InputStream is) {
         try {
-            InputStream in = urlConnection.getInputStream();
-
-            Scanner scanner = new Scanner(in);
-            scanner.useDelimiter("\\A");
-
-            boolean hasInput = scanner.hasNext();
-            if (hasInput) {
-                return scanner.next();
-            } else {
-                return null;
+            ByteArrayOutputStream bo = new ByteArrayOutputStream();
+            int i = is.read();
+            while(i != -1) {
+                bo.write(i);
+                i = is.read();
             }
-        } finally {
-            urlConnection.disconnect();
+            return bo.toString();
+        } catch (IOException e) {
+            return "";
         }
     }
+    // a generic scan function so that multiple delimiters can be pulled from a string
+    public static String scanInput(String delimiter, String input) {
+        int index = 0;
+        String local_id = null;
+        Scanner scanner = new Scanner(input);
+        scanner.useDelimiter(delimiter);
+        boolean hasInput = scanner.hasNext();
+        input = scanner.next();
+        input = scanner.next();
+        if(hasInput){
+            index = input.indexOf("\",");
+            if (index > 0) {
+                local_id = input.substring(0, index);
+            }
+        }
+        return local_id;
+    }
 }
-

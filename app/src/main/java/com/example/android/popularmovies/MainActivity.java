@@ -14,28 +14,35 @@ import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
 import static com.example.android.popularmovies.Utils.buildUrlForDetail;
+import static com.example.android.popularmovies.Utils.readStream;
+import static com.example.android.popularmovies.Utils.scanInput;
+
 import static java.lang.Boolean.FALSE;
 
 
-public class MainActivity extends AppCompatActivity implements ImageAdapter.ItemClickListener {
-    private ImageAdapter adapter;
-
+public class MainActivity extends AppCompatActivity implements MovieAdapter.ItemClickListener {
+    private MovieAdapter adapter;
     private Boolean networkIsAvailable = FALSE;
     private Context context;
     public TextView mSearchResultsTextView;
 
-    public static List<MovieDetail> movies;
+
+    public RecyclerView.Adapter recyclerView_Adapter;
+    public RecyclerView.LayoutManager recyclerView_LayoutManager;
+    public RecyclerView recyclerView;
+
+    public static ArrayList<MovieDetail> movies;
 
     public class MovieDbQueryTask extends AsyncTask<URL, Void, String> {
-
-        //http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=78891bb3d2c1b1ee69109f6f46b23ead
 
         @Override
         protected void onPreExecute() {
@@ -47,13 +54,22 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Item
             URL searchUrl = params[0];
             String movieDbResults = null;
             URL detailUrl;
+            MovieDetail mMovieDetail;
+            String mMovie_Id;
+            int i = 0;
 
             try {
+                // the buildUrlfor is adding and deleting members
                 movieDbResults = getResponseFromHttpUrl(searchUrl);
-                for (int i = 0; i < movies.size(); i++) {
-                    //Log.d("array list: ", movies.get(i).movie_id);
-                    detailUrl = buildUrlForDetail(movies.get(i).movie_id);
-                    getMovieDetail(detailUrl,i);
+                Iterator<MovieDetail> mIterator = movies.iterator();
+
+                while(mIterator.hasNext()){
+                    mMovieDetail = mIterator.next();
+                    mMovie_Id = mMovieDetail.movie_id;
+                    detailUrl = buildUrlForDetail(mMovie_Id);
+                    getMovieDetail(detailUrl,i,mMovieDetail);
+//                    Log.d("List_Movie_id ", mMovieDetail.movie_id + " " + String.valueOf(i) );
+                    i++;
                 }
 
             } catch (IOException e) {
@@ -64,20 +80,29 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Item
 
         @Override
         protected void onPostExecute(String movieDbResults) {
-            Log.d("array size: ", String.valueOf(movies.size()));
-            for (int i = 0; i < movies.size(); i++) {
-                Log.d("array list ", movies.get(i).movie_original_title);
-                Log.d("array list ", movies.get(i).movie_overview);
+            Log.d("onPostExecute ", String.valueOf(movies.size()));
+
+            Iterator<MovieDetail> mIterator = movies.iterator();
+            int i = 0;
+            MovieDetail mMovieDetail;
+            while(mIterator.hasNext()){
+                mMovieDetail = mIterator.next();
+                Log.d("onPostExecute ", mMovieDetail.movie_id + " " + String.valueOf(i) + mMovieDetail.movie_original_title );
+                i++;
             }
+
             showJsonDataView();
-            mSearchResultsTextView.setText(movieDbResults);
+           // mSearchResultsTextView.setText(movieDbResults);
             Log.d("onPost show JsonData","getting ready to exit");
         }
+
      }
 
     private void showJsonDataView() {
-        mSearchResultsTextView.setVisibility(View.VISIBLE);
-    }
+        recyclerView.setVisibility(View.VISIBLE);
+        recyclerView_Adapter.notifyDataSetChanged();
+     }
+
     private void hideJsonDataView() {
         mSearchResultsTextView.setVisibility(View.INVISIBLE);
     }
@@ -94,12 +119,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Item
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        String[] data = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15",
-                "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30",
-                "31", "32", "34", "35", "36", "37", "39"
-        };
-
-        numberOfColumns = 2;
+         numberOfColumns = 2;
         context = getApplicationContext();
 
         //hide the extra text view until it is needed
@@ -110,32 +130,24 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Item
         utils = new Utils();
         networkIsAvailable = utils.isNetworkAvailable(context);
 
-        // set up the recycler view with the layout and the adapter
-        recyclerView = findViewById(R.id.rvImages);
-        recyclerView_LayoutManager = new GridLayoutManager(context, numberOfColumns);
-        if (recyclerView_LayoutManager != null) {
-            recyclerView.setLayoutManager(recyclerView_LayoutManager);
-        }
-
+        // call this function to build the query to return one page of movies
         url = Utils.buildUrl();
         // create the an arraylist of the moviedetail based on the id from the moviedb
         movies = new ArrayList<MovieDetail>();
 
         //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
-        //Log.d("1 process",url.toString());
         new MovieDbQueryTask().execute(url);
 
-        // check to make sure the ids are stored properly
-//        Log.d("array size: ", String.valueOf(movies.size()));
-//        for (int i = 0; i < movies.size(); i++) {
-//            Log.d("array list: ", movies.get(i).movie_id);
-//        }
-
-
-        recyclerView_Adapter = new ImageAdapter(context, data);
-        if (recyclerView_Adapter != null) {
-            recyclerView.setAdapter(recyclerView_Adapter);
+        Log.d("onCreate ", " ");
+        Iterator<MovieDetail> mIterator = movies.iterator();
+        int i = 0;
+        MovieDetail mMovieDetail;
+        while(mIterator.hasNext()){
+            mMovieDetail = mIterator.next();
+            Log.d("onCreate ", mMovieDetail.movie_id + " " + String.valueOf(i) + mMovieDetail.movie_original_title );
+            i++;
         }
+
     }
 
     @Override
@@ -153,12 +165,32 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Item
             finish();
         }
 
+
+
+
+        recyclerView = findViewById(R.id.rvImages);
+        recyclerView_Adapter = new MovieAdapter(context, movies);
+        if (recyclerView_Adapter != null) {
+            recyclerView.setAdapter(recyclerView_Adapter);
+            recyclerView.setVisibility(View.INVISIBLE);
+        }
+
+        int numberOfColumns = 2;
+        recyclerView_LayoutManager = new GridLayoutManager(context, numberOfColumns);
+        if (recyclerView_LayoutManager != null) {
+            recyclerView.setLayoutManager(recyclerView_LayoutManager);
+        }
+
     }
 
+
+//    // query the database for popular movies, and then scan the stream for every movie_id in order
+//    // to save in the arraylist of MovieDetail
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         String local_input = null;
         int index = 0;
+        int count = 0;
         MovieDetail mMovieDetail;
 
         try {
@@ -178,6 +210,8 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Item
                     String local_id = local_input.substring(0, index);
                     mMovieDetail = new MovieDetail(local_id);
                     movies.add(mMovieDetail);
+                    //Log.d("Parse_the_first_http_response ", local_id + " " + movies.get(count).movie_id + " " + String.valueOf(count));
+                    count++;
                 }
                 hasInput = scanner.hasNext();
 
@@ -189,14 +223,12 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Item
         }
     }
 
-    public boolean getMovieDetail(URL url, int i){
+    //pass the url of the movie_id, along with the mMovieDetail instance from the arraylist
+    public boolean getMovieDetail(URL url, int i, MovieDetail mMovieDetail){
 
         HttpURLConnection urlConnection = null;
         String local_input = null;
         String copy_of_local_input = null;
-        int index = 0;
-        Scanner[] scanner;
-        MovieDetail mMovieDetail = new MovieDetail("1");
 
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -205,7 +237,8 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Item
         }
 
         try {
-            mMovieDetail.movie_id = movies.get(i).movie_id;
+           // get the json file for the movie_id
+           // and then parse the jason using Scanners
 
             InputStream in = urlConnection.getInputStream();
             local_input = readStream(in);
@@ -230,10 +263,6 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Item
             String release_date = scanInput("release_date\":\"", local_input);
             local_input = copy_of_local_input;
             mMovieDetail.release_date = release_date;
-            //Log.d("end of detail"," ");
-
-            movies.add(mMovieDetail);
-            movies.remove(i);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -241,37 +270,6 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Item
             urlConnection.disconnect();
         }
         return true;
-    }
-    private String scanInput(String delimiter, String input) {
-        int index = 0;
-        String local_id = null;
-        Scanner scanner = new Scanner(input);
-        scanner.useDelimiter(delimiter);
-        boolean hasInput = scanner.hasNext();
-        input = scanner.next();
-        input = scanner.next();
-        if(hasInput){
-            index = input.indexOf("\",");
-            if (index > 0) {
-                local_id = input.substring(0, index);
-                //Log.d(delimiter, local_id);
-            }
-        }
-        return local_id;
-    }
-
-    private String readStream(InputStream is) {
-        try {
-            ByteArrayOutputStream bo = new ByteArrayOutputStream();
-            int i = is.read();
-            while(i != -1) {
-                bo.write(i);
-                i = is.read();
-            }
-            return bo.toString();
-        } catch (IOException e) {
-            return "";
-        }
     }
 
 }
