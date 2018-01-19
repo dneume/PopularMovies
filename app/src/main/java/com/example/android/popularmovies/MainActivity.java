@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,11 +21,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Scanner;
 
 import static com.example.android.popularmovies.Utils.buildUrlForDetail;
 import static com.example.android.popularmovies.Utils.readStream;
 import static com.example.android.popularmovies.Utils.scanInput;
+import static com.example.android.popularmovies.Utils.buildUrlForThumbNailFile;
 
 import static java.lang.Boolean.FALSE;
 
@@ -34,13 +37,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     private Boolean networkIsAvailable = FALSE;
     private Context context;
     public TextView mSearchResultsTextView;
-
+    public ImageView mImageView;
 
     public RecyclerView.Adapter recyclerView_Adapter;
     public RecyclerView.LayoutManager recyclerView_LayoutManager;
     public RecyclerView recyclerView;
 
-    public static ArrayList<MovieDetail> movies;
+    public static List<MovieDetail> movies;
+    public ListIterator<MovieDetail> mIterator;
 
     public class MovieDbQueryTask extends AsyncTask<URL, Void, String> {
 
@@ -56,19 +60,22 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
             URL detailUrl;
             MovieDetail mMovieDetail;
             String mMovie_Id;
-            int i = 0;
 
+            int i = 0;
+            ImageView mImageView;
+
+            mImageView = (ImageView) findViewById(R.id.display_image);
             try {
                 // the buildUrlfor is adding and deleting members
                 movieDbResults = getResponseFromHttpUrl(searchUrl);
-                Iterator<MovieDetail> mIterator = movies.iterator();
 
+                mIterator = movies.listIterator(0);
                 while(mIterator.hasNext()){
                     mMovieDetail = mIterator.next();
                     mMovie_Id = mMovieDetail.movie_id;
                     detailUrl = buildUrlForDetail(mMovie_Id);
                     getMovieDetail(detailUrl,i,mMovieDetail);
-//                    Log.d("List_Movie_id ", mMovieDetail.movie_id + " " + String.valueOf(i) );
+                    Log.d("List_Movie_id ", mMovieDetail.movie_id + " " + String.valueOf(i) );
                     i++;
                 }
 
@@ -82,12 +89,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         protected void onPostExecute(String movieDbResults) {
             Log.d("onPostExecute ", String.valueOf(movies.size()));
 
-            Iterator<MovieDetail> mIterator = movies.iterator();
+            mIterator = movies.listIterator(0);
             int i = 0;
             MovieDetail mMovieDetail;
             while(mIterator.hasNext()){
                 mMovieDetail = mIterator.next();
                 Log.d("onPostExecute ", mMovieDetail.movie_id + " " + String.valueOf(i) + mMovieDetail.movie_original_title );
+//                Log.d("continued...complete path. ", mMovieDetail.movie_complete_path);
                 i++;
             }
 
@@ -99,6 +107,21 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
      }
 
     private void showJsonDataView() {
+//        Context context = getApplicationContext();
+//        String mMovie_complete_path = null;
+//        ImageView mImageView = findViewById(R.id.display_image);
+//        Picasso mPicasso = null;
+//
+//        Iterator<MovieDetail> mIterator = movies.iterator();
+//        int i = 0;
+//        MovieDetail mMovieDetail;
+//        while(mIterator.hasNext()){
+//            mMovieDetail = mIterator.next();
+//            mMovie_complete_path = mMovieDetail.movie_complete_path;
+//            Log.d("show Jason data...complete path. ", mMovieDetail.movie_complete_path);
+//            mPicasso.with(context).load(mMovie_complete_path).into(mImageView);
+//            i++;
+//        }
         recyclerView.setVisibility(View.VISIBLE);
         recyclerView_Adapter.notifyDataSetChanged();
      }
@@ -132,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
         // call this function to build the query to return one page of movies
         url = Utils.buildUrl();
+
         // create the an arraylist of the moviedetail based on the id from the moviedb
         movies = new ArrayList<MovieDetail>();
 
@@ -139,13 +163,20 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         new MovieDbQueryTask().execute(url);
 
         Log.d("onCreate ", " ");
-        Iterator<MovieDetail> mIterator = movies.iterator();
-        int i = 0;
-        MovieDetail mMovieDetail;
-        while(mIterator.hasNext()){
-            mMovieDetail = mIterator.next();
-            Log.d("onCreate ", mMovieDetail.movie_id + " " + String.valueOf(i) + mMovieDetail.movie_original_title );
-            i++;
+        //movies.listIterator() = new ListIterator<MovieDetail>;
+        if(movies.isEmpty() == FALSE) {
+            Log.d("on create ", " NOT EMPTY" );
+            mIterator = movies.listIterator(0);
+            int i = 0;
+            MovieDetail mMovieDetail;
+            while(mIterator.hasNext()) {
+                mMovieDetail = mIterator.next();
+                Log.d("onCreate ", mMovieDetail.movie_id + " " + String.valueOf(i) + mMovieDetail.movie_original_title);
+                i++;
+            }
+         }
+        else {
+            Log.d("on create ", " IS EMPTY" );
         }
 
     }
@@ -167,6 +198,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
 
 
+        ImageView mImageView = findViewById(R.id.display_image);
 
         recyclerView = findViewById(R.id.rvImages);
         recyclerView_Adapter = new MovieAdapter(context, movies);
@@ -180,7 +212,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         if (recyclerView_LayoutManager != null) {
             recyclerView.setLayoutManager(recyclerView_LayoutManager);
         }
-
     }
 
 
@@ -229,6 +260,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         HttpURLConnection urlConnection = null;
         String local_input = null;
         String copy_of_local_input = null;
+        URL mUrl = null;
 
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -263,6 +295,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
             String release_date = scanInput("release_date\":\"", local_input);
             local_input = copy_of_local_input;
             mMovieDetail.release_date = release_date;
+
+            mUrl = buildUrlForThumbNailFile(mMovieDetail.movie_thumbnail_path);
+            mMovieDetail.movie_complete_path = mUrl.toString();
+
+
 
         } catch (IOException e) {
             e.printStackTrace();

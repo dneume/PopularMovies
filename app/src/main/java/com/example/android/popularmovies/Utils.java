@@ -1,12 +1,21 @@
 package com.example.android.popularmovies;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+
+
 
 import java.io.ByteArrayOutputStream;
 import java.net.MalformedURLException;
@@ -14,11 +23,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.IOException;
 import android.net.Uri;
+import android.os.Environment;
 import android.util.Log;
 import android.view.ViewDebug;
 
 import java.io.InputStream;
 import java.util.Scanner;
+
+import com.squareup.picasso.Picasso;
 
 /**
  * Created by dneum on 1/11/2018.
@@ -36,6 +48,11 @@ public class Utils {
     final static String PARAM_LANG = "en-US";
     final static String KEY_PAGE = "page";
     final static String PARAM_PAGE = "2";
+
+    final static String BASE_IMAGE_URL =
+            "http://image.tmdb.org/t/p";
+    final static String IMAGE_SIZE = "w185";
+
     // https://api.themoviedb.org/3/movie/popular?api_key=<<api_key>>&language=en-US&page=1
 
     public void Utils() {
@@ -56,7 +73,7 @@ public class Utils {
 
     }
 
-    public static URL buildUrl() {
+    public static URL  buildUrl() {
         URL url = null;
         Uri.Builder uriBuilder = null;
         Uri uri;
@@ -102,7 +119,30 @@ public class Utils {
         Log.d("detail url", local);
         return url;
     }
+    public static URL buildUrlForThumbNailFile(String movie_thumbnail_path) {
 
+//        BASE_IMAGE_URL =
+//                "http://image.tmdb.org/t/p";
+//        IMAGE_SIZE = "w185";
+        URL url = null;
+        Uri.Builder uriBuilder = null;
+        Uri uri;
+
+        uri = Uri.parse(BASE_IMAGE_URL);
+        uriBuilder = uri.buildUpon();
+        uriBuilder.appendPath(IMAGE_SIZE);
+        String local = movie_thumbnail_path.substring(1);
+        uriBuilder.appendPath(local);
+        uri = uriBuilder.build();
+        Log.d("path to jpg",uriBuilder.toString());
+
+        try {
+            url = new URL(uri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
     // read the http input stream into a buffer so that the buffer can be used by multiple scanners
     public static String readStream(InputStream is) {
         try {
