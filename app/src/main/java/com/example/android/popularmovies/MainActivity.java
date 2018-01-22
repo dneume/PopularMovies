@@ -1,16 +1,28 @@
 package com.example.android.popularmovies;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.content.Context;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.ActionProvider;
+import android.view.ContextMenu;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+//import android.widget.Toolbar;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -30,6 +42,7 @@ import static com.example.android.popularmovies.Utils.scanInput;
 import static com.example.android.popularmovies.Utils.buildUrlForThumbNailFile;
 
 import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ItemClickListener {
@@ -37,7 +50,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     private Boolean networkIsAvailable = FALSE;
     private Context context;
     public TextView mSearchResultsTextView;
-    public ImageView mImageView;
+    //public ImageView mImageView;
+    public Menu menu;
+    private int sort_option;
 
     public RecyclerView.Adapter recyclerView_Adapter;
     public RecyclerView.LayoutManager recyclerView_LayoutManager;
@@ -51,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            movies.clear();
         }
 
         @Override
@@ -153,11 +169,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         utils = new Utils();
         networkIsAvailable = utils.isNetworkAvailable(context);
 
-        // call this function to build the query to return one page of movies
-        url = Utils.buildUrl();
+
 
         // create the an arraylist of the moviedetail based on the id from the moviedb
         movies = new ArrayList<MovieDetail>();
+
+        // call this function to build the query to return one page of movies
+        url = Utils.buildUrl("Popular");
 
         //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
         new MovieDbQueryTask().execute(url);
@@ -181,10 +199,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
     }
 
-    @Override
-    public void onItemClick(View view, int position) {
 
-    }
+    @Override
+    public void onItemClick(View view, int position) { }
+
+
 
     @Override
     public void onPostCreate(Bundle savedInstanceState) {
@@ -195,10 +214,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
             Toast.makeText(this, "Try again once a network is available!", Toast.LENGTH_LONG).show();
             finish();
         }
-
-
-
-        ImageView mImageView = findViewById(R.id.display_image);
 
         recyclerView = findViewById(R.id.rvImages);
         recyclerView_Adapter = new MovieAdapter(context, movies);
@@ -212,11 +227,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         if (recyclerView_LayoutManager != null) {
             recyclerView.setLayoutManager(recyclerView_LayoutManager);
         }
+
     }
 
 
-//    // query the database for popular movies, and then scan the stream for every movie_id in order
-//    // to save in the arraylist of MovieDetail
+//     query the database for popular movies, and then scan the stream for every movie_id in order
+//     to save in the arraylist of MovieDetail
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         String local_input = null;
@@ -309,6 +325,61 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         return true;
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Within onCreateOptionsMenu, use getMenuInflater().inflate to inflate the menu
+        getMenuInflater().inflate(R.menu.menus,menu);
+//      //  Return true to display your menu
+
+        sort_option = R.id.popular;
+
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu){
+
+        return TRUE;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+
+        int id_of_item_checked = menuItem.getItemId();
+        URL url;
+
+        switch (id_of_item_checked){
+            case R.id.popular:
+                // checkable behavior is single so no need to uncheck the other menu item
+                menuItem.setChecked(TRUE);
+                if(sort_option == R.id.popular)
+                        return true;
+                Toast.makeText(context,  "Display list of popular movies " , Toast.LENGTH_LONG).show();
+
+                sort_option = R.id.popular;
+                // call this function to build the query to return one page of movies
+                url = Utils.buildUrl("Popular");
+                //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
+                new MovieDbQueryTask().execute(url);
+                return true;
+            case R.id.highest:
+                menuItem.setChecked(TRUE);
+                if(sort_option == R.id.highest)
+                    return true;
+                Toast.makeText(context, "Get list of highest rated movies " , Toast.LENGTH_LONG).show();
+                sort_option = R.id.highest;
+
+                // call this function to build the query to return one page of movies
+                url = Utils.buildUrl("Highest");
+                //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
+                new MovieDbQueryTask().execute(url);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(menuItem);
+    }
 }
+
 
 

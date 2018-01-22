@@ -42,6 +42,7 @@ public class Utils {
             "http://api.themoviedb.org/3/movie/";
     final static String KEY_SORT = "sort_by";
     final static String PARAM_POPULAR = "popular";
+    final static String PARAM_HIGHEST = "top_rated";
     final static String KEY_API = "api_key";
     final static String PARAM_API_KEY = "78891bb3d2c1b1ee69109f6f46b23ead";
     final static String KEY_LANG = "LANGUAGE";
@@ -73,14 +74,18 @@ public class Utils {
 
     }
 
-    public static URL  buildUrl() {
+    public static URL  buildUrl(String sort_order) {
         URL url = null;
         Uri.Builder uriBuilder = null;
         Uri uri;
 
         uri = Uri.parse(BASE_URL);
         uriBuilder = uri.buildUpon();
-        uriBuilder.appendPath(PARAM_POPULAR);
+
+        if(sort_order == "Popular")
+            uriBuilder.appendPath(PARAM_POPULAR);
+        else
+            uriBuilder.appendPath(PARAM_HIGHEST);
         uriBuilder.appendQueryParameter(KEY_API, PARAM_API_KEY);
         uriBuilder.appendQueryParameter(KEY_LANG, PARAM_LANG);
         uriBuilder.appendQueryParameter(KEY_PAGE, PARAM_PAGE);

@@ -1,11 +1,24 @@
 <resources>
 
-    <!-- Base application theme. -->
+     <!--Base application theme.-->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+           <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textSize">17sp</item>
     </style>
 
+    <!--<style name="CheckedStyle" parent="@android:style/Theme.DeviceDefault.Light">-->
+        <!--<item name="android:textAppearance">@android:style/TextAppearance.Medium</item>-->
+        <!--<item name="android:textSize">11sp</item>-->
+        <!--<item name="android:textStyle">bold</item>-->
+    <!--</style>-->
+
+    <!--<style name="NotCheckedStyle" parent="@android:style/Theme.DeviceDefault.Light">-->
+        <!--<item name="android:textAppearance">@android:style/TextAppearance.Medium</item>-->
+        <!--<item name="android:textSize">4sp</item>-->
+        <!--<item name="android:textStyle">normal</item>-->
+
+    <!--</style>-->
 </resources>

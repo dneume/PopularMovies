@@ -22,31 +22,33 @@ import java.util.ListIterator;
  * Created by dneum on 1/9/2018.
  */
 
-public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
+
+
+public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder>  {
 
     private List<MovieDetail> mMovieDetail;
     private Context mContext;
-
-
     private ItemClickListener mClickListener;
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ImageView movie_ImageView;
         private TextView movie_title_TextView;
+
 
         public ViewHolder(View itemView){
             super(itemView);
             movie_title_TextView = (TextView) itemView.findViewById(R.id.list_movies_title);
             movie_ImageView = (ImageView) itemView.findViewById(R.id.display_image);
-   //         itemView.setOnClickListener(this);
+            itemView.setOnClickListener(this);
         }
 
-//        @Override
-//        public void onClickListner(View view) {
-//            if(mClickListener != null)
-//                mClickListener.onItemClick(view, getAdapterPosition());
-//        }
+        @Override
+        public void onClick(View view) {
+            if(mClickListener != null)
+                mClickListener.onItemClick(view, getAdapterPosition());
+            Log.d("OnClickListner ", String.valueOf(getAdapterPosition()));
+        }
     }
 
     public MovieAdapter(Context context, List<MovieDetail> movie) {
@@ -81,7 +83,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         viewHolder.movie_title_TextView.setText(mMovie_title);
 
         Picasso mPicasso = null;
-        mPicasso.with(mContext).load(mMovie_complete_path).into(viewHolder.movie_ImageView);
+        mPicasso.with(mContext).load(mMovie_complete_path).fit().into(viewHolder.movie_ImageView);
         //Log.d("On bind ",mMovie_title + " " + String.valueOf(position));
 
     }
