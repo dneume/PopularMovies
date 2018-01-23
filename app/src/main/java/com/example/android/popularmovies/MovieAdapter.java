@@ -1,8 +1,6 @@
 package com.example.android.popularmovies;
 
-import android.support.v7.app.AppCompatActivity;
 import android.content.Context;
-import android.media.Image;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,28 +11,20 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-//import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * Created by dneum on 1/9/2018.
  */
 
-
-
-public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder>  {
+public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
 
     private List<MovieDetail> mMovieDetail;
     private Context mContext;
-    private ItemClickListener mClickListener;
-
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ImageView movie_ImageView;
         private TextView movie_title_TextView;
-
 
         public ViewHolder(View itemView){
             super(itemView);
@@ -42,18 +32,19 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
             movie_ImageView = (ImageView) itemView.findViewById(R.id.display_image);
             itemView.setOnClickListener(this);
         }
-
-        @Override
-        public void onClick(View view) {
-            if(mClickListener != null)
-                mClickListener.onItemClick(view, getAdapterPosition());
-            Log.d("OnClickListner ", String.valueOf(getAdapterPosition()));
-        }
+        //pass the view and the adapter position to the custom listener
+         public void onClick(View view) {
+            int position = getAdapterPosition();
+            if(mCustomListener != null) {
+                mCustomListener.onCustomItemClick(view,position);
+            }
+         }
     }
 
-    public MovieAdapter(Context context, List<MovieDetail> movie) {
+    public MovieAdapter(Context context, List<MovieDetail> movie, onCustomItemClickListener listener) {
         mContext = context;
         mMovieDetail = movie;
+        mCustomListener = listener;
     }
 
      private Context getContext() {
@@ -97,12 +88,17 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         return mMovieDetail.get(id).movie_id;
     }
 
-    void setClickListener(ItemClickListener itemClickListener) {
-        this.mClickListener = itemClickListener;
+    public interface OnClickListener {
+        void onClick(View view, int position);
     }
 
-    public interface ItemClickListener {
-        void onItemClick(View view, int position);
+    // create the public interface and an instance of the custom interface
+    // mCustomListener is set in the constructor of the MovieAdapte
+    public interface onCustomItemClickListener {
+        void onCustomItemClick(View view, int position);
     }
+    private onCustomItemClickListener mCustomListener;
 
 }
+
+

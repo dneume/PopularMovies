@@ -38,6 +38,7 @@ public class MovieDetail {
         this.movie_image = null;
     }
 
+
 }
 
 

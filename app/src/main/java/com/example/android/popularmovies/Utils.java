@@ -6,11 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
-
 import static android.content.Context.CONNECTIVITY_SERVICE;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;

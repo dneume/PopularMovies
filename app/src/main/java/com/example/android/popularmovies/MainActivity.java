@@ -1,37 +1,31 @@
 package com.example.android.popularmovies;
 
-import android.content.ComponentName;
+
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
+
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.content.Context;
-import android.support.v7.widget.Toolbar;
+
 import android.util.Log;
-import android.view.ActionProvider;
-import android.view.ContextMenu;
-import android.view.KeyEvent;
+
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-//import android.widget.Toolbar;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
+
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Scanner;
@@ -45,13 +39,13 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 
-public class MainActivity extends AppCompatActivity implements MovieAdapter.ItemClickListener {
-    private MovieAdapter adapter;
+public class MainActivity extends AppCompatActivity {
+//    private MovieAdapter adapter;
     private Boolean networkIsAvailable = FALSE;
     private Context context;
     public TextView mSearchResultsTextView;
     //public ImageView mImageView;
-    public Menu menu;
+//    public Menu menu;
     private int sort_option;
 
     public RecyclerView.Adapter recyclerView_Adapter;
@@ -60,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
     public static List<MovieDetail> movies;
     public ListIterator<MovieDetail> mIterator;
+
 
     public class MovieDbQueryTask extends AsyncTask<URL, Void, String> {
 
@@ -123,21 +118,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
      }
 
     private void showJsonDataView() {
-//        Context context = getApplicationContext();
-//        String mMovie_complete_path = null;
-//        ImageView mImageView = findViewById(R.id.display_image);
-//        Picasso mPicasso = null;
-//
-//        Iterator<MovieDetail> mIterator = movies.iterator();
-//        int i = 0;
-//        MovieDetail mMovieDetail;
-//        while(mIterator.hasNext()){
-//            mMovieDetail = mIterator.next();
-//            mMovie_complete_path = mMovieDetail.movie_complete_path;
-//            Log.d("show Jason data...complete path. ", mMovieDetail.movie_complete_path);
-//            mPicasso.with(context).load(mMovie_complete_path).into(mImageView);
-//            i++;
-//        }
         recyclerView.setVisibility(View.VISIBLE);
         recyclerView_Adapter.notifyDataSetChanged();
      }
@@ -169,8 +149,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         utils = new Utils();
         networkIsAvailable = utils.isNetworkAvailable(context);
 
-
-
         // create the an arraylist of the moviedetail based on the id from the moviedb
         movies = new ArrayList<MovieDetail>();
 
@@ -200,8 +178,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     }
 
 
-    @Override
-    public void onItemClick(View view, int position) { }
+//    @Override
+    public void onItemClick(View view, int position) {
+        Log.d(" main activity ", " onItemClick" + " " + String.valueOf(position));
+    }
 
 
 
@@ -216,7 +196,19 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         }
 
         recyclerView = findViewById(R.id.rvImages);
-        recyclerView_Adapter = new MovieAdapter(context, movies);
+
+        // create the movie adapter and set the custom listener to return the click value
+        recyclerView_Adapter = new MovieAdapter(context,
+                movies,
+                new MovieAdapter.onCustomItemClickListener() {
+                    @Override
+                    public void onCustomItemClick(View view, int position) {
+
+                        Log.d("onclick view ", " in main activity " + String.valueOf(position));
+                    }
+                }
+        );
+
         if (recyclerView_Adapter != null) {
             recyclerView.setAdapter(recyclerView_Adapter);
             recyclerView.setVisibility(View.INVISIBLE);
@@ -227,7 +219,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         if (recyclerView_LayoutManager != null) {
             recyclerView.setLayoutManager(recyclerView_LayoutManager);
         }
-
     }
 
 
@@ -328,18 +319,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-//        // Within onCreateOptionsMenu, use getMenuInflater().inflate to inflate the menu
+       // Within onCreateOptionsMenu, use getMenuInflater().inflate to inflate the menu
         getMenuInflater().inflate(R.menu.menus,menu);
-//      //  Return true to display your menu
-
+      //  Return true to display your menu
         sort_option = R.id.popular;
-
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu){
-
         return TRUE;
     }
 
@@ -379,6 +367,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
         return super.onOptionsItemSelected(menuItem);
     }
+
+    public boolean launchDetailActivity() {
+        Intent i;
+        i = new Intent(this, DetailActivity.class);
+        startActivity(i);
+        return TRUE;
+    }
+
 }
 
 
