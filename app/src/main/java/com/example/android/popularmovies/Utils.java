@@ -166,10 +166,16 @@ public class Utils {
         boolean hasInput = scanner.hasNext();
         input = scanner.next();
         input = scanner.next();
-        if(hasInput){
+        if(hasInput) {
             index = input.indexOf("\",");
             if (index > 0) {
                 local_id = input.substring(0, index);
+                // lets get the average vote number
+            } else {
+                index = input.indexOf(",");
+                if (index > 0) {
+                    local_id = input.substring(0, index);
+                }
             }
         }
         return local_id;

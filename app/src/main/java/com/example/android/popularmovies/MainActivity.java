@@ -10,6 +10,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.content.Context;
 
+import android.text.Layout;
 import android.util.Log;
 
 import android.view.Menu;
@@ -39,13 +40,11 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 
-public class MainActivity extends AppCompatActivity {
-//    private MovieAdapter adapter;
+public class  MainActivity extends AppCompatActivity {
+
     private Boolean networkIsAvailable = FALSE;
     private Context context;
     public TextView mSearchResultsTextView;
-    //public ImageView mImageView;
-//    public Menu menu;
     private int sort_option;
 
     public RecyclerView.Adapter recyclerView_Adapter;
@@ -205,6 +204,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onCustomItemClick(View view, int position) {
 
                         Log.d("onclick view ", " in main activity " + String.valueOf(position));
+                        launchDetailActivity(position);
                     }
                 }
         );
@@ -283,6 +283,8 @@ public class MainActivity extends AppCompatActivity {
             local_input = readStream(in);
             copy_of_local_input = local_input;
 
+
+
             String original_title = scanInput("original_title\":\"", local_input);
             local_input = copy_of_local_input;
              mMovieDetail.movie_original_title = original_title;
@@ -295,9 +297,11 @@ public class MainActivity extends AppCompatActivity {
             local_input = copy_of_local_input;
             mMovieDetail.movie_overview = overview;
 
+
             String vote_average = scanInput("vote_average\":", local_input);
             local_input = copy_of_local_input;
             mMovieDetail.move_user_rating = vote_average;
+
 
             String release_date = scanInput("release_date\":\"", local_input);
             local_input = copy_of_local_input;
@@ -368,9 +372,29 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(menuItem);
     }
 
-    public boolean launchDetailActivity() {
+    public boolean launchDetailActivity(int position) {
         Intent i;
+        String ldetail = "detail";
+        MovieDetail mMovieDetail;
+        String[] mMovieDetailExtras = new String[7];
+
+        // position is the index of the item clicked in the grid array
+        // get the position in the array and pass the movie detail in the intent
+        mMovieDetail = movies.get(position);
+        mMovieDetailExtras[0] = mMovieDetail.movie_id;
+        mMovieDetailExtras[1] = mMovieDetail.movie_original_title;
+        mMovieDetailExtras[2] = mMovieDetail.movie_thumbnail_path;
+        mMovieDetailExtras[3] = mMovieDetail.movie_overview;
+        mMovieDetailExtras[4] = mMovieDetail.move_user_rating;
+        mMovieDetailExtras[5] = mMovieDetail.release_date;
+        mMovieDetailExtras[6] = mMovieDetail.movie_complete_path;
+
+        // need to rewrite the code to get the menu to inflate on the child menu.
+        // see Menu API documentation for more info
+        invalidateOptionsMenu();
+
         i = new Intent(this, DetailActivity.class);
+        i.putExtra(ldetail,mMovieDetailExtras);
         startActivity(i);
         return TRUE;
     }
