@@ -33,21 +33,21 @@ import com.squareup.picasso.Picasso;
 
 public class Utils {
 
-    final static String BASE_URL =
+    private final static String BASE_URL =
             "http://api.themoviedb.org/3/movie/";
-    final static String KEY_SORT = "sort_by";
-    final static String PARAM_POPULAR = "popular";
-    final static String PARAM_HIGHEST = "top_rated";
-    final static String KEY_API = "api_key";
-    final static String PARAM_API_KEY = "78891bb3d2c1b1ee69109f6f46b23ead";
-    final static String KEY_LANG = "LANGUAGE";
-    final static String PARAM_LANG = "en-US";
-    final static String KEY_PAGE = "page";
-    final static String PARAM_PAGE = "2";
+    private final static String KEY_SORT = "sort_by";
+    private final static String PARAM_POPULAR = "popular";
+    private final static String PARAM_HIGHEST = "top_rated";
+    private final static String KEY_API = "api_key";
+    private final static String PARAM_API_KEY = "78891bb3d2c1b1ee69109f6f46b23ead";
+    private final static String KEY_LANG = "LANGUAGE";
+    private final static String PARAM_LANG = "en-US";
+    private final static String KEY_PAGE = "page";
+    private final static String PARAM_PAGE = "2";
 
-    final static String BASE_IMAGE_URL =
+    private final static String BASE_IMAGE_URL =
             "http://image.tmdb.org/t/p";
-    final static String IMAGE_SIZE = "w185";
+    private final static String IMAGE_SIZE = "w185";
 
     // https://api.themoviedb.org/3/movie/popular?api_key=<<api_key>>&language=en-US&page=1
 
@@ -69,7 +69,7 @@ public class Utils {
 
     }
 
-    public static URL  buildUrl(String sort_order) {
+    public static URL  buildUrl(String sort_order, Context context) {
         URL url = null;
         Uri.Builder uriBuilder = null;
         Uri uri;
@@ -81,7 +81,7 @@ public class Utils {
             uriBuilder.appendPath(PARAM_POPULAR);
         else
             uriBuilder.appendPath(PARAM_HIGHEST);
-        uriBuilder.appendQueryParameter(KEY_API, PARAM_API_KEY);
+        uriBuilder.appendQueryParameter(KEY_API, context.getResources().getString(R.string.movie_api_key_dtn));
         uriBuilder.appendQueryParameter(KEY_LANG, PARAM_LANG);
         uriBuilder.appendQueryParameter(KEY_PAGE, PARAM_PAGE);
         uri = uriBuilder.build();
@@ -95,7 +95,6 @@ public class Utils {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-//        Log.d("build url", local);
         return url;
     }
     public static URL buildUrlForDetail(String movie_id) {
@@ -116,14 +115,11 @@ public class Utils {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        Log.d("detail url", local);
+        Log.d("Return from detail url", local);
         return url;
     }
     public static URL buildUrlForThumbNailFile(String movie_thumbnail_path) {
 
-//        BASE_IMAGE_URL =
-//                "http://image.tmdb.org/t/p";
-//        IMAGE_SIZE = "w185";
         URL url = null;
         Uri.Builder uriBuilder = null;
         Uri uri;
@@ -167,11 +163,12 @@ public class Utils {
         input = scanner.next();
         input = scanner.next();
         if(hasInput) {
+            //this will get the value of a \" delimited string
             index = input.indexOf("\",");
             if (index > 0) {
                 local_id = input.substring(0, index);
-                // lets get the average vote number
             } else {
+                // this will get the value of a numeric/integer value
                 index = input.indexOf(",");
                 if (index > 0) {
                     local_id = input.substring(0, index);

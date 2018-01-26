@@ -72,9 +72,7 @@ public class  MainActivity extends AppCompatActivity {
             String mMovie_Id;
 
             int i = 0;
-            ImageView mImageView;
 
-            mImageView = (ImageView) findViewById(R.id.display_image);
             try {
                 // the buildUrlfor is adding and deleting members
                 movieDbResults = getResponseFromHttpUrl(searchUrl);
@@ -105,13 +103,10 @@ public class  MainActivity extends AppCompatActivity {
             while(mIterator.hasNext()){
                 mMovieDetail = mIterator.next();
                 Log.d("onPostExecute ", mMovieDetail.movie_id + " " + String.valueOf(i) + mMovieDetail.movie_original_title );
-//                Log.d("continued...complete path. ", mMovieDetail.movie_complete_path);
                 i++;
             }
-
             showJsonDataView();
-           // mSearchResultsTextView.setText(movieDbResults);
-            Log.d("onPost show JsonData","getting ready to exit");
+            Log.d("onPost Execute","getting ready to exit");
         }
 
      }
@@ -127,7 +122,7 @@ public class  MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        int numberOfColumns = 0;
+
         URL url;
         Utils utils;
         RecyclerView.Adapter recyclerView_Adapter;
@@ -137,7 +132,6 @@ public class  MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-         numberOfColumns = 2;
         context = getApplicationContext();
 
         //hide the extra text view until it is needed
@@ -152,13 +146,12 @@ public class  MainActivity extends AppCompatActivity {
         movies = new ArrayList<MovieDetail>();
 
         // call this function to build the query to return one page of movies
-        url = Utils.buildUrl("Popular");
+        url = Utils.buildUrl("Popular",context);
 
         //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
         new MovieDbQueryTask().execute(url);
 
         Log.d("onCreate ", " ");
-        //movies.listIterator() = new ListIterator<MovieDetail>;
         if(movies.isEmpty() == FALSE) {
             Log.d("on create ", " NOT EMPTY" );
             mIterator = movies.listIterator(0);
@@ -189,7 +182,7 @@ public class  MainActivity extends AppCompatActivity {
         super.onPostCreate(savedInstanceState);
         //IF the network is not available...do something
         if(!networkIsAvailable) {
-            Toast.makeText(this, "'Popular Movies' requires a network, but one cannot be found!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "'Movies to Watch!' requires a network, but one cannot be found!", Toast.LENGTH_LONG).show();
             Toast.makeText(this, "Try again once a network is available!", Toast.LENGTH_LONG).show();
             finish();
         }
@@ -240,6 +233,7 @@ public class  MainActivity extends AppCompatActivity {
             boolean hasInput = scanner.hasNext();
             local_input = scanner.next();
 
+            // Retrieve all the movie IDs and put them into List Array
             while (hasInput) {
 
                 local_input = scanner.next();
@@ -248,7 +242,6 @@ public class  MainActivity extends AppCompatActivity {
                     String local_id = local_input.substring(0, index);
                     mMovieDetail = new MovieDetail(local_id);
                     movies.add(mMovieDetail);
-                    //Log.d("Parse_the_first_http_response ", local_id + " " + movies.get(count).movie_id + " " + String.valueOf(count));
                     count++;
                 }
                 hasInput = scanner.hasNext();
@@ -278,12 +271,9 @@ public class  MainActivity extends AppCompatActivity {
         try {
            // get the json file for the movie_id
            // and then parse the jason using Scanners
-
             InputStream in = urlConnection.getInputStream();
             local_input = readStream(in);
             copy_of_local_input = local_input;
-
-
 
             String original_title = scanInput("original_title\":\"", local_input);
             local_input = copy_of_local_input;
@@ -351,7 +341,7 @@ public class  MainActivity extends AppCompatActivity {
 
                 sort_option = R.id.popular;
                 // call this function to build the query to return one page of movies
-                url = Utils.buildUrl("Popular");
+                url = Utils.buildUrl("Popular",context);
                 //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
                 new MovieDbQueryTask().execute(url);
                 return true;
@@ -359,11 +349,11 @@ public class  MainActivity extends AppCompatActivity {
                 menuItem.setChecked(TRUE);
                 if(sort_option == R.id.highest)
                     return true;
-                Toast.makeText(context, "Get list of highest rated movies " , Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "Display list of highest rated movies " , Toast.LENGTH_LONG).show();
                 sort_option = R.id.highest;
 
                 // call this function to build the query to return one page of movies
-                url = Utils.buildUrl("Highest");
+                url = Utils.buildUrl("Highest",context);
                 //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
                 new MovieDbQueryTask().execute(url);
                 return true;

@@ -28,8 +28,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
         public ViewHolder(View itemView){
             super(itemView);
-            movie_title_TextView = (TextView) itemView.findViewById(R.id.list_movies_title);
-            movie_ImageView = (ImageView) itemView.findViewById(R.id.display_image);
+            movie_title_TextView = itemView.findViewById(R.id.list_movies_title);
+            movie_ImageView = itemView.findViewById(R.id.display_image);
             itemView.setOnClickListener(this);
         }
         //pass the view and the adapter position to the custom listener
@@ -74,9 +74,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         viewHolder.movie_title_TextView.setText(mMovie_title);
 
         Picasso mPicasso = null;
-        mPicasso.with(mContext).load(mMovie_complete_path).fit().into(viewHolder.movie_ImageView);
-        //Log.d("On bind ",mMovie_title + " " + String.valueOf(position));
-
+        Picasso.with(mContext).load(mMovie_complete_path).fit().into(viewHolder.movie_ImageView);
     }
 
     @Override
@@ -97,7 +95,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     public interface onCustomItemClickListener {
         void onCustomItemClick(View view, int position);
     }
-    private onCustomItemClickListener mCustomListener;
+    public onCustomItemClickListener mCustomListener;
 
 }
 

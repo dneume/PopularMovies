@@ -24,7 +24,6 @@ public class MovieDetail {
     String move_user_rating;
     String release_date;
     String movie_complete_path;
-    BitmapDrawable movie_image;
 
     public MovieDetail(String id)
     {
@@ -35,7 +34,6 @@ public class MovieDetail {
         this.move_user_rating = "tbd";
         this.release_date = "tbd";
         this.movie_complete_path = "tbd";
-        this.movie_image = null;
     }
 
 

@@ -31,7 +31,7 @@ public class DetailActivity extends Activity {
         mContext = getApplicationContext();
         super.onCreate(savedInstanceState);
 
-        // get the current and Intent and retrieve the movie detail
+        // get the current Intent and retrieve the movie detail
         Intent intent = getIntent();
         mDetail = intent.getStringArrayExtra(ldetail);
         mMovieDetail.movie_id = mDetail[0];
@@ -49,7 +49,7 @@ public class DetailActivity extends Activity {
         ImageView mImageView = new ImageView(mContext);
         mImageView = findViewById(R.id.display_detail_image);
         Picasso mPicasso = null;
-        mPicasso.with(mContext).load(mMovieDetail.movie_complete_path).fit().into(mImageView);
+        Picasso.with(mContext).load(mMovieDetail.movie_complete_path).fit().into(mImageView);
 
 
         TextView mTitle = new TextView(mContext);

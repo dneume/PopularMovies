@@ -19,7 +19,8 @@
         android:background="@color/colorAccent"
         android:cropToPadding="true"
         android:foregroundGravity="center"
-        android:scaleType="centerCrop" />
+        android:scaleType="centerCrop"
+        android:contentDescription="moviePoster" />
 
     <TextView
         android:id="@+id/list_movies_title"

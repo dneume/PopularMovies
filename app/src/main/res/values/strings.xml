@@ -1,9 +1,10 @@
 <resources>
-    <string name="app_name">Movies to watch!</string>
+    <string name="app_name">Movies to Watch!</string>
     <string name="title_activity_display_movie_detail">Movie Details</string>
 
     <!-- Strings related to Settings -->
-
+    <string name="movie_api_key_dtn">78891bb3d2c1b1ee69109f6f46b23ead</string>;
+    <string name="movie_api_key">Empty</string>;
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
 
