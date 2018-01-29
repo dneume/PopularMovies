@@ -72,6 +72,7 @@ public class  MainActivity extends AppCompatActivity {
             String mMovie_Id;
 
             int i = 0;
+            Context context = getBaseContext();
 
             try {
                 // the buildUrlfor is adding and deleting members
@@ -81,7 +82,7 @@ public class  MainActivity extends AppCompatActivity {
                 while(mIterator.hasNext()){
                     mMovieDetail = mIterator.next();
                     mMovie_Id = mMovieDetail.movie_id;
-                    detailUrl = buildUrlForDetail(mMovie_Id);
+                    detailUrl = buildUrlForDetail(mMovie_Id,context);
                     getMovieDetail(detailUrl,i,mMovieDetail);
                     Log.d("List_Movie_id ", mMovieDetail.movie_id + " " + String.valueOf(i) );
                     i++;

@@ -39,7 +39,7 @@ public class Utils {
     private final static String PARAM_POPULAR = "popular";
     private final static String PARAM_HIGHEST = "top_rated";
     private final static String KEY_API = "api_key";
-    private final static String PARAM_API_KEY = "78891bb3d2c1b1ee69109f6f46b23ead";
+
     private final static String KEY_LANG = "LANGUAGE";
     private final static String PARAM_LANG = "en-US";
     private final static String KEY_PAGE = "page";
@@ -97,7 +97,7 @@ public class Utils {
         }
         return url;
     }
-    public static URL buildUrlForDetail(String movie_id) {
+    public static URL buildUrlForDetail(String movie_id, Context context) {
         URL url = null;
         Uri.Builder uriBuilder = null;
         Uri uri;
@@ -105,7 +105,7 @@ public class Utils {
         uri = Uri.parse(BASE_URL);
         uriBuilder = uri.buildUpon();
         uriBuilder.appendPath(movie_id);
-        uriBuilder.appendQueryParameter(KEY_API, PARAM_API_KEY);
+        uriBuilder.appendQueryParameter(KEY_API, context.getResources().getString(R.string.movie_api_key_dtn));
         uri = uriBuilder.build();
 
         String local = uriBuilder.toString();
