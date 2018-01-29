@@ -39,7 +39,7 @@ public class Utils {
     private final static String PARAM_POPULAR = "popular";
     private final static String PARAM_HIGHEST = "top_rated";
     private final static String KEY_API = "api_key";
-    private final static String PARAM_API_KEY = "78891bb3d2c1b1ee69109f6f46b23ead";
+    private final static String PARAM_API_KEY = "";
     private final static String KEY_LANG = "LANGUAGE";
     private final static String PARAM_LANG = "en-US";
     private final static String KEY_PAGE = "page";
@@ -81,7 +81,7 @@ public class Utils {
             uriBuilder.appendPath(PARAM_POPULAR);
         else
             uriBuilder.appendPath(PARAM_HIGHEST);
-        uriBuilder.appendQueryParameter(KEY_API, context.getResources().getString(R.string.movie_api_key_dtn));
+        uriBuilder.appendQueryParameter(KEY_API, context.getResources().getString(R.string.movie_api_key));
         uriBuilder.appendQueryParameter(KEY_LANG, PARAM_LANG);
         uriBuilder.appendQueryParameter(KEY_PAGE, PARAM_PAGE);
         uri = uriBuilder.build();
