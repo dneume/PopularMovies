@@ -41,7 +41,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
          }
     }
 
-    public MovieAdapter(Context context, List<MovieDetail> movie, onCustomItemClickListener listener) {
+    public MovieAdapter(Context context, List<MovieDetail> movie, OnCustomItemClickListener listener) {
         mContext = context;
         mMovieDetail = movie;
         mCustomListener = listener;
@@ -92,10 +92,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
     // create the public interface and an instance of the custom interface
     // mCustomListener is set in the constructor of the MovieAdapte
-    public interface onCustomItemClickListener {
+    public interface OnCustomItemClickListener {
         void onCustomItemClick(View view, int position);
     }
-    public onCustomItemClickListener mCustomListener;
+    public OnCustomItemClickListener mCustomListener;
 
 }
 

@@ -10,13 +10,11 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.content.Context;
 
-import android.text.Layout;
 import android.util.Log;
 
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -193,7 +191,7 @@ public class  MainActivity extends AppCompatActivity {
         // create the movie adapter and set the custom listener to return the click value
         recyclerView_Adapter = new MovieAdapter(context,
                 movies,
-                new MovieAdapter.onCustomItemClickListener() {
+                new MovieAdapter.OnCustomItemClickListener() {
                     @Override
                     public void onCustomItemClick(View view, int position) {
 

@@ -43,7 +43,7 @@ public class Utils {
     private final static String KEY_LANG = "LANGUAGE";
     private final static String PARAM_LANG = "en-US";
     private final static String KEY_PAGE = "page";
-    private final static String PARAM_PAGE = "2";
+    private final static String PARAM_PAGE = "1";
 
     private final static String BASE_IMAGE_URL =
             "http://image.tmdb.org/t/p";
@@ -51,7 +51,7 @@ public class Utils {
 
     // https://api.themoviedb.org/3/movie/popular?api_key=<<api_key>>&language=en-US&page=1
 
-    public void Utils() {
+    public void utils() {
 
     }
 

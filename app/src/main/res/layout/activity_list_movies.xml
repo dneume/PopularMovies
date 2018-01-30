@@ -20,7 +20,8 @@
         android:contentDescription="moviePoster"
         android:cropToPadding="true"
         android:foregroundGravity="center"
-        android:scaleType="centerCrop" />
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true" />
 
     <TextView
         android:id="@+id/list_movies_title"

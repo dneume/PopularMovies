@@ -3,20 +3,15 @@ package com.example.android.popularmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.app.Activity;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
-
-public class DetailActivity extends Activity {
+public class DetailActivity extends AppCompatActivity {
 
     private Context mContext;
     private MovieDetail mLocalMovieDetail;
