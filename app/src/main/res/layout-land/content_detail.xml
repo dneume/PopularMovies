@@ -1,34 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
-xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-xmlns:tools="http://schemas.android.com/tools"
-android:id="@+id/relativeLayout"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:orientation="horizontal"
-android:padding="8dp"
-android:visibility="visible" >
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-  <android.support.constraint.ConstraintLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content">
 
-      <ImageView
-          android:id="@+id/display_detail_image"
-          android:layout_width="179dp"
-          android:layout_height="149dp"
-          android:layout_margin="8dp"
-          android:layout_marginStart="8dp"
-          android:layout_marginLeft="8dp"
-          android:adjustViewBounds="true"
-          android:background="@color/colorAccent"
-          android:contentDescription="moviePoster"
-          android:cropToPadding="true"
-          android:foregroundGravity="center"
-          android:scaleType="fitCenter"
-          app:layout_constraintStart_toStartOf="@+id/guideline"
-          app:layout_constraintTop_toTopOf="parent" />
+     <android.support.constraint.ConstraintLayout
+         android:id="@+id/relativeLayout"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:orientation="horizontal"
+         android:padding="8dp"
+         android:visibility="visible" >
+
+         <ImageView
+             android:id="@+id/display_detail_image"
+             android:layout_marginLeft="8dp"
+             android:layout_width="92dp"
+             android:layout_height="149dp"
+             android:layout_margin="8dp"
+             android:layout_marginStart="8dp"
+             android:adjustViewBounds="true"
+             android:background="@color/colorAccent"
+             android:contentDescription="moviePoster"
+             android:cropToPadding="true"
+             android:foregroundGravity="center"
+             android:scaleType="fitCenter"
+             app:layout_constraintStart_toStartOf="@+id/guideline"
+             app:layout_constraintTop_toTopOf="parent" />
 
       <TextView
           android:id="@+id/display_movie_title"
@@ -43,26 +44,23 @@ android:visibility="visible" >
           app:layout_constraintStart_toStartOf="@+id/guideline"
           app:layout_constraintTop_toBottomOf="@+id/display_detail_image" />
 
-    <TextView
-        android:id="@+id/display_overview"
-        android:layout_width="355dp"
-        android:layout_height="261dp"
+         <TextView
+             android:id="@+id/display_overview"
+             android:layout_width="355dp"
+             android:layout_height="283dp"
 
-        android:layout_marginBottom="24dp"
-        android:layout_marginEnd="176dp"
-        android:layout_marginRight="176dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:gravity="start"
-        android:includeFontPadding="false"
-        android:text="movie overview"
-        android:textAlignment="textStart"
-        android:textSize="16sp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/display_detail_image" />
+             android:layout_marginBottom="8dp"
+             android:layout_marginEnd="8dp"
+             android:layout_marginRight="8dp"
+             android:gravity="start"
+             android:includeFontPadding="false"
+             android:text="movie overview"
+             android:textAlignment="textStart"
+             android:textSize="16sp"
+             android:visibility="visible"
+             app:layout_constraintBottom_toBottomOf="parent"
+             app:layout_constraintEnd_toEndOf="parent"
+             app:layout_constraintStart_toEndOf="@+id/display_movie_title" />
 
     <TextView
         android:id="@+id/display_user_rating"
@@ -98,12 +96,12 @@ android:visibility="visible" >
     android:orientation="vertical"
     app:layout_constraintGuide_begin="20dp" />
 
-    <android.support.constraint.Guideline
-    android:id="@+id/guideline2"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    app:layout_constraintGuide_begin="8dp" />
+         <android.support.constraint.Guideline
+             android:id="@+id/guideline2"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:orientation="horizontal"
+             app:layout_constraintGuide_begin="16dp" />
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>
