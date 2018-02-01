@@ -43,7 +43,8 @@ public class  MainActivity extends AppCompatActivity {
     private Boolean networkIsAvailable = FALSE;
     private Context context;
     public TextView mSearchResultsTextView;
-    private int sort_option;
+    // default the sort option to 0 so that the proper option
+    public static String sort_option = null;
 
     public RecyclerView.Adapter recyclerView_Adapter;
     public RecyclerView.LayoutManager recyclerView_LayoutManager;
@@ -122,7 +123,7 @@ public class  MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        URL url;
+        URL url = null;
         Utils utils;
         RecyclerView.Adapter recyclerView_Adapter;
         RecyclerView.LayoutManager recyclerView_LayoutManager;
@@ -145,7 +146,13 @@ public class  MainActivity extends AppCompatActivity {
         movies = new ArrayList<MovieDetail>();
 
         // call this function to build the query to return one page of movies
-        url = Utils.buildUrl("Popular",context);
+        // first time thru, the sort_option is set to the default
+        //otherwise, the sort_option is a global variable
+        Log.d("OnCreate sort_optionVal", String.valueOf(sort_option));
+        if(sort_option == null) {
+            sort_option = "Popular";
+        }
+        url = Utils.buildUrl(sort_option, context);
 
         //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
         new MovieDbQueryTask().execute(url);
@@ -213,10 +220,27 @@ public class  MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save the user's current game state
+       savedInstanceState.putString("Sort_option",sort_option);
+       // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        // Always call the superclass so it can restore the view hierarchy
+        super.onRestoreInstanceState(savedInstanceState);
+        // Restore state members from saved instance
+        sort_option = savedInstanceState.getString("Sort_option");
+   }
+
 
 //     query the database for popular movies, and then scan the stream for every movie_id in order
 //     to save in the arraylist of MovieDetail
     public static String getResponseFromHttpUrl(URL url) throws IOException {
+        Log.d("getResponseFromHttpUrl",url.toString());
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         String local_input = null;
         int index = 0;
@@ -314,13 +338,18 @@ public class  MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
        // Within onCreateOptionsMenu, use getMenuInflater().inflate to inflate the menu
         getMenuInflater().inflate(R.menu.menus,menu);
-      //  Return true to display your menu
-        sort_option = R.id.popular;
+
+//      //  Only on the first time through is the option == 0, otherwise the sort_option is set
+//      // on onRestoreInstanceState
+//        if(sort_option == 0)
+//            sort_option = R.id.popular;
+
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu){
+
         return TRUE;
     }
 
@@ -334,25 +363,25 @@ public class  MainActivity extends AppCompatActivity {
             case R.id.popular:
                 // checkable behavior is single so no need to uncheck the other menu item
                 menuItem.setChecked(TRUE);
-                if(sort_option == R.id.popular)
+                if(sort_option == "Popular")
                         return true;
                 Toast.makeText(context,  "Display list of popular movies " , Toast.LENGTH_LONG).show();
 
-                sort_option = R.id.popular;
+                sort_option = "Popular";
                 // call this function to build the query to return one page of movies
-                url = Utils.buildUrl("Popular",context);
+                url = Utils.buildUrl(sort_option,context);
                 //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
                 new MovieDbQueryTask().execute(url);
                 return true;
             case R.id.highest:
                 menuItem.setChecked(TRUE);
-                if(sort_option == R.id.highest)
+                if(sort_option == "Highest")
                     return true;
                 Toast.makeText(context, "Display list of highest rated movies " , Toast.LENGTH_LONG).show();
-                sort_option = R.id.highest;
+                sort_option = "Highest";
 
                 // call this function to build the query to return one page of movies
-                url = Utils.buildUrl("Highest",context);
+                url = Utils.buildUrl(sort_option,context);
                 //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
                 new MovieDbQueryTask().execute(url);
                 return true;
