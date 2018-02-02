@@ -5,10 +5,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 
 public class DetailActivity extends AppCompatActivity {
@@ -22,19 +29,41 @@ public class DetailActivity extends AppCompatActivity {
         String[] mDetail = new String[7];
         MovieDetail mMovieDetail = new MovieDetail(String.valueOf(0));
         String ldetail = "detail";
+        int lengthOfRating;
 
         mContext = getApplicationContext();
         super.onCreate(savedInstanceState);
 
         // get the current Intent and retrieve the movie detail
         Intent intent = getIntent();
+
         mDetail = intent.getStringArrayExtra(ldetail);
         mMovieDetail.movie_id = mDetail[0];
         mMovieDetail.movie_original_title = mDetail[1];
         mMovieDetail.movie_thumbnail_path = mDetail[2];
         mMovieDetail.movie_overview = mDetail[3];
-        mMovieDetail.move_user_rating = mDetail[4];
-        mMovieDetail.release_date = mDetail[5];
+
+        // get the first 4 digits of the rating
+        String mMovieRating = mDetail[4];
+        lengthOfRating = mMovieRating.length();
+        if(lengthOfRating < 4)
+            mMovieDetail.move_user_rating = mMovieRating.substring(0, lengthOfRating);
+        else
+            mMovieDetail.move_user_rating = mMovieRating.substring(0, 4);
+
+        //format the date
+        Date date = null;
+        String holdDate = mDetail[5];
+        DateFormat df = new SimpleDateFormat("yyyy-mm-dd");
+        try {
+            date = df.parse(holdDate);
+            df = new SimpleDateFormat("dd MMM, yyyy");
+            holdDate = df.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        mMovieDetail.release_date = holdDate;
+
         mMovieDetail.movie_complete_path = mDetail[6];
 
         //display the xml file for the detail window view
