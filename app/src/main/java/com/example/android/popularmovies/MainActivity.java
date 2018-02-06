@@ -4,6 +4,7 @@ package com.example.android.popularmovies;
 import android.content.Intent;
 
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -27,9 +28,13 @@ import java.util.ArrayList;
 
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 import static com.example.android.popularmovies.Utils.buildUrlForDetail;
+import static com.example.android.popularmovies.Utils.buildUrlForReviews;
+import static com.example.android.popularmovies.Utils.buildUrlForVideos;
 import static com.example.android.popularmovies.Utils.readStream;
 import static com.example.android.popularmovies.Utils.scanInput;
 import static com.example.android.popularmovies.Utils.buildUrlForThumbNailFile;
@@ -67,6 +72,8 @@ public class  MainActivity extends AppCompatActivity {
             URL searchUrl = params[0];
             String movieDbResults = null;
             URL detailUrl;
+            URL reviewUrl;
+            URL videoUrl;
             MovieDetail mMovieDetail;
             String mMovie_Id;
 
@@ -84,6 +91,25 @@ public class  MainActivity extends AppCompatActivity {
                     detailUrl = buildUrlForDetail(mMovie_Id,context);
                     getMovieDetail(detailUrl,i,mMovieDetail);
                     Log.d("List_Movie_id ", mMovieDetail.movie_id + " " + String.valueOf(i) );
+
+//                    //get the list of reviews
+//                    int number_of_reviews = 0;
+//                    reviewUrl = buildUrlForReviews(mMovieDetail.movie_id, context);
+//                    number_of_reviews = getMovieReviews_org(mMovieDetail.movie_review, reviewUrl);
+//                    Log.d("number of reviews", String.valueOf(number_of_reviews));
+
+//                  http 429 is being averted by slowing down the processing
+//                    SystemClock.sleep(400);
+
+                    // get the list of videos
+                    int number_of_videos = 0;
+                    videoUrl = buildUrlForVideos(mMovieDetail.movie_id, context);
+                    number_of_videos = getMovieVideos(mMovieDetail.movie_trailer, videoUrl);
+                    Log.d("number of videos",String.valueOf(number_of_videos));
+
+//                  http 429 is being averted by slowing down the processing
+                    SystemClock.sleep(400);
+
                     i++;
                 }
 
@@ -278,7 +304,7 @@ public class  MainActivity extends AppCompatActivity {
     }
 
     //pass the url of the movie_id, along with the mMovieDetail instance from the arraylist
-    public boolean getMovieDetail(URL url, int i, MovieDetail mMovieDetail){
+    public boolean getMovieDetail(URL url, int i, MovieDetail mMovieDetail) {
 
         HttpURLConnection urlConnection = null;
         String local_input = null;
@@ -289,18 +315,19 @@ public class  MainActivity extends AppCompatActivity {
             urlConnection = (HttpURLConnection) url.openConnection();
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
 
         try {
-           // get the json file for the movie_id
-           // and then parse the jason using Scanners
+            // get the json file for the movie_id
+            // and then parse the jason using Scanners
             InputStream in = urlConnection.getInputStream();
             local_input = readStream(in);
             copy_of_local_input = local_input;
 
             String original_title = scanInput("original_title\":\"", local_input);
             local_input = copy_of_local_input;
-             mMovieDetail.movie_original_title = original_title;
+            mMovieDetail.movie_original_title = original_title;
 
             String poster_path = scanInput("poster_path\":\"", local_input);
             local_input = copy_of_local_input;
@@ -323,26 +350,145 @@ public class  MainActivity extends AppCompatActivity {
             mUrl = buildUrlForThumbNailFile(mMovieDetail.movie_thumbnail_path);
             mMovieDetail.movie_complete_path = mUrl.toString();
 
-
-
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         } finally {
             urlConnection.disconnect();
         }
         return true;
     }
 
+    public int getMovieReviews_org(URL url[],URL urlToTheReviews) throws IOException {
+
+        String local_input = null;
+        String checkForUrl = null;
+        int index = 0;
+        int count = 0;
+        int attempts = 0;
+
+        HttpURLConnection urlConnection = (HttpURLConnection) urlToTheReviews.openConnection();
+
+        if (urlConnection.getResponseCode() != 200) {
+
+            Log.d("urlreview in method", String.valueOf(urlConnection.getResponseCode()) + " " + urlConnection.getResponseMessage());
+            Map<String, List<String>> headers = urlConnection.getHeaderFields();
+            Set<Map.Entry<String, List<String>>> entrySet = headers.entrySet();
+            for (Map.Entry<String, List<String>> entry : entrySet) {
+                String headerName = entry.getKey();
+                if(headerName == null)
+                        headerName = "NULL";
+                Log.d("Header Name:", headerName);
+                List<String> headerValues = entry.getValue();
+                for (String value : headerValues) {
+                    Log.d("Header value:", value);
+                }
+            }
+            urlConnection.disconnect();
+            return urlConnection.getResponseCode();
+        }
+
+
+        try {
+            InputStream in = urlConnection.getInputStream();
+            local_input = readStream(in);
+
+            //scanner for the url string
+            Scanner scanner = new Scanner(local_input);
+            scanner.useDelimiter("\"url\":\"");
+
+            // not all movies have a review so need to check that there is at least one
+            checkForUrl = scanner.findInLine("\"url\":\"");
+            if(checkForUrl == null) {
+                urlConnection.disconnect();
+                return count;
+            }
+
+            // Retrieve each url for the movie review url Array
+             while(scanner.hasNext()) {
+                local_input = scanner.next();
+                index = local_input.indexOf("\"");
+                if (index > 0) {
+                    String local_id = local_input.substring(0, index);
+                    url[count] = new URL(local_id);
+                    count++;
+                }
+            }
+
+        } finally {
+            urlConnection.disconnect();
+        }
+        return count;
+    }
+
+    public int getMovieVideos(String videos[],URL urlToTheVideos) throws IOException {
+
+        String local_input = null;
+        String checkForVideo = null;
+        int index = 0;
+        int count = 0;
+        int attempts = 0;
+
+        HttpURLConnection urlConnection = (HttpURLConnection) urlToTheVideos.openConnection();
+
+        if (urlConnection.getResponseCode() != 200) {
+
+            Log.d("urlreview in method", String.valueOf(urlConnection.getResponseCode()) + " " + urlConnection.getResponseMessage());
+            Map<String, List<String>> headers = urlConnection.getHeaderFields();
+            Set<Map.Entry<String, List<String>>> entrySet = headers.entrySet();
+            for (Map.Entry<String, List<String>> entry : entrySet) {
+                String headerName = entry.getKey();
+                if(headerName == null)
+                    headerName = "NULL";
+                Log.d("Header Name:", headerName);
+                List<String> headerValues = entry.getValue();
+                for (String value : headerValues) {
+                    Log.d("Header value:", value);
+                }
+            }
+            urlConnection.disconnect();
+            return urlConnection.getResponseCode();
+        }
+
+
+        try {
+            InputStream in = urlConnection.getInputStream();
+            local_input = readStream(in);
+
+            //scanner for the url string
+            Scanner scanner = new Scanner(local_input);
+            scanner.useDelimiter("\"name\":\"");
+
+            // not all movies have a review so need to check that there is at least one
+            checkForVideo = scanner.findInLine("\"name\":\"");
+            if(checkForVideo == null) {
+                urlConnection.disconnect();
+                return count;
+            }
+
+            // Retrieve each url for the movie review url Array
+            while(scanner.hasNext()) {
+                local_input = scanner.next();
+                index = local_input.indexOf("\",");
+                if (index > 0) {
+                    String local_buf = local_input.substring(0, index);
+                    String local_id = local_buf.replace("\\","");
+                    videos[count] = local_id;
+                    Log.d("VideoName",local_id);
+                    count++;
+                }
+            }
+
+        } finally {
+            urlConnection.disconnect();
+        }
+        return count;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
        // Within onCreateOptionsMenu, use getMenuInflater().inflate to inflate the menu
         getMenuInflater().inflate(R.menu.menus,menu);
-
-//      //  Only on the first time through is the option == 0, otherwise the sort_option is set
-//      // on onRestoreInstanceState
-//        if(sort_option == 0)
-//            sort_option = R.id.popular;
 
         return true;
     }

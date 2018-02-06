@@ -23,6 +23,11 @@
             android:name=".DetailActivity"
             android:label="Movie Preview!">
         </activity>
+        <activity
+            android:name=".MovieReviewActivity"
+            android:label="Movie Reviews!">
+        </activity>
+
     </application>
 
 </manifest>

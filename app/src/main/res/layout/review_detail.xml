@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:id="@+id/display_original_movie_title"
+        android:layout_width="250dp"
+        android:layout_height="82dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
+        android:autoSizeTextType="uniform"
+        android:ems="10"
+        android:gravity="start"
+        android:text="Title of Movie"
+        android:textAlignment="textStart"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/display_written_by"
+        android:layout_width="120dp"
+        android:layout_height="20dp"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentRight="false"
+        android:layout_below="@id/display_movie_review_count"
+        android:layout_marginRight="8dp"
+        android:layout_toRightOf="@id/display_original_movie_title"
+        android:text="Written by:"
+        android:textAlignment="textStart"
+        android:layout_gravity="start"
+        android:textAllCaps="false"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="12sp"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/display_author"
+        android:layout_width="1120dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentRight="false"
+        android:layout_below="@id/display_written_by"
+        android:layout_marginRight="8dp"
+        android:layout_toRightOf="@id/display_original_movie_title"
+        android:text="author"
+        android:textAlignment="textStart"
+        android:layout_gravity="start"
+        android:textAllCaps="false"
+        android:textColor="@android:color/holo_green_dark"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/display_movie_review_count"
+        android:layout_width="120dp"
+        android:layout_height="22dp"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentRight="false"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_toRightOf="@id/display_original_movie_title"
+        android:textAlignment="textStart"
+        android:layout_gravity="start"
+        android:textAllCaps="false"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="12sp"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/display_web_review"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/display_original_movie_title"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:textSize="14sp" />
+
+    <!--android:autoSizeTextType="uniform"-->
+
+        android:backgroundTint="@android:color/background_dark"
+        android:textAlignment="viewStart"
+        android:textStyle="normal"
+        <!--android:autoSizeMaxTextSize="18sp"-->
+        <!--android:autoSizeMinTextSize="8sp"-->
+        <!--android:autoSizeStepGranularity="2sp"-->
+        <!--android:autoSizePresetSizes="14sp"-->
+        <!--android:maxLines="20"-->
+        android:visibility="visible" />
+
+</RelativeLayout>

@@ -24,6 +24,11 @@ public class MovieDetail {
     String move_user_rating;
     String release_date;
     String movie_complete_path;
+    String movie_review[];
+    String movie_trailer[];
+    // movie_review and movie_trailers are placeholders for an unknown number of reviews and trailers
+    // the assumption is that 20 trailers and 20 movie reviews are plenty
+
 
     public MovieDetail(String id)
     {
@@ -34,6 +39,8 @@ public class MovieDetail {
         this.move_user_rating = "tbd";
         this.release_date = "tbd";
         this.movie_complete_path = "tbd";
+        this.movie_review = new String[20];
+        this.movie_trailer = new String[20];
     }
 
 

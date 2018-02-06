@@ -17,7 +17,7 @@ import java.util.List;
  * Created by dneum on 1/9/2018.
  */
 
-public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
+public class  MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
 
     private List<MovieDetail> mMovieDetail;
     private Context mContext;

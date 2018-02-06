@@ -48,6 +48,8 @@ public class Utils {
     private final static String BASE_IMAGE_URL =
             "http://image.tmdb.org/t/p";
     private final static String IMAGE_SIZE = "w185";
+    private final static String PARAM_REVIEWS = "reviews";
+    private final static String PARAM_VIDEOS = "videos";
 
     // https://api.themoviedb.org/3/movie/popular?api_key=<<api_key>>&language=en-US&page=1
 
@@ -118,6 +120,53 @@ public class Utils {
         Log.d("Return from detail url", local);
         return url;
     }
+
+    public static URL buildUrlForReviews(String movie_id, Context context) {
+        URL url = null;
+        Uri.Builder uriBuilder = null;
+        Uri uri;
+
+        uri = Uri.parse(BASE_URL);
+        uriBuilder = uri.buildUpon();
+        uriBuilder.appendPath(movie_id);
+        uriBuilder.appendPath(PARAM_REVIEWS);
+        uriBuilder.appendQueryParameter(KEY_API, context.getResources().getString(R.string.movie_api_key_dtn));
+        uri = uriBuilder.build();
+
+        String local = uriBuilder.toString();
+
+        try {
+            url = new URL(uri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+//        Log.d("Return from reviews url", local);
+        return url;
+    }
+
+    public static URL buildUrlForVideos(String movie_id, Context context) {
+        URL url = null;
+        Uri.Builder uriBuilder = null;
+        Uri uri;
+
+        uri = Uri.parse(BASE_URL);
+        uriBuilder = uri.buildUpon();
+        uriBuilder.appendPath(movie_id);
+        uriBuilder.appendPath(PARAM_VIDEOS);
+        uriBuilder.appendQueryParameter(KEY_API, context.getResources().getString(R.string.movie_api_key_dtn));
+        uri = uriBuilder.build();
+
+        String local = uriBuilder.toString();
+
+        try {
+            url = new URL(uri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        Log.d("Return from videos url", local);
+        return url;
+    }
+
     public static URL buildUrlForThumbNailFile(String movie_thumbnail_path) {
 
         URL url = null;
@@ -142,14 +191,33 @@ public class Utils {
     // read the http input stream into a buffer so that the buffer can be used by multiple scanners
     public static String readStream(InputStream is) {
         try {
+            int backslash = 0;
             ByteArrayOutputStream bo = new ByteArrayOutputStream();
             int i = is.read();
-            while(i != -1) {
+            while (i != -1) {
+
+                // trapping the newline carriage return in an input stream
+                // and replacing with a space, also
+                // forward slashes in general are being bypassed
+                if (i == 92) {
+                    backslash = 92;
+                    try {
+                        i = is.read();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                    if (i == 114 || i == 110) {
+                        i = 32;
+                        backslash = 0;
+                    }
+                }
                 bo.write(i);
                 i = is.read();
             }
             return bo.toString();
+
         } catch (IOException e) {
+            Log.d("Exception_msg",e.getMessage());
             return "";
         }
     }
