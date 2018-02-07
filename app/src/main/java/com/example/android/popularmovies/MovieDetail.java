@@ -1,16 +1,5 @@
 package com.example.android.popularmovies;
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Array;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Scanner;
-
 /**
  * Created by dneum on 1/15/2018.
  */

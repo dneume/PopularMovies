@@ -1,7 +1,5 @@
 package com.example.android.popularmovies;
 
-import java.net.URL;
-
 /**
  * Created by dneum on 2/5/2018.
  */

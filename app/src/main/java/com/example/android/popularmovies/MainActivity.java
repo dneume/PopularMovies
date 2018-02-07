@@ -33,7 +33,6 @@ import java.util.Scanner;
 import java.util.Set;
 
 import static com.example.android.popularmovies.Utils.buildUrlForDetail;
-import static com.example.android.popularmovies.Utils.buildUrlForReviews;
 import static com.example.android.popularmovies.Utils.buildUrlForVideos;
 import static com.example.android.popularmovies.Utils.readStream;
 import static com.example.android.popularmovies.Utils.scanInput;

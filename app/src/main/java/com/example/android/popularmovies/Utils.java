@@ -1,8 +1,6 @@
 package com.example.android.popularmovies;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
@@ -14,18 +12,13 @@ import static java.lang.Boolean.TRUE;
 
 import java.io.ByteArrayOutputStream;
 import java.net.MalformedURLException;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.IOException;
 import android.net.Uri;
-import android.os.Environment;
 import android.util.Log;
-import android.view.ViewDebug;
 
 import java.io.InputStream;
 import java.util.Scanner;
-
-import com.squareup.picasso.Picasso;
 
 /**
  * Created by dneum on 1/11/2018.

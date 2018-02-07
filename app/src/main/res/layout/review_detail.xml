@@ -88,16 +88,4 @@
         android:layout_marginRight="8dp"
         android:textSize="14sp" />
 
-    <!--android:autoSizeTextType="uniform"-->
-
-        android:backgroundTint="@android:color/background_dark"
-        android:textAlignment="viewStart"
-        android:textStyle="normal"
-        <!--android:autoSizeMaxTextSize="18sp"-->
-        <!--android:autoSizeMinTextSize="8sp"-->
-        <!--android:autoSizeStepGranularity="2sp"-->
-        <!--android:autoSizePresetSizes="14sp"-->
-        <!--android:maxLines="20"-->
-        android:visibility="visible" />
-
 </RelativeLayout>
