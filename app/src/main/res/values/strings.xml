@@ -5,6 +5,9 @@
     <!-- youtube apikey from google -->
     <!-- the format is key=API_KEY as a paramter -->
 
+    <string name="you_tube_api_key"></string>
+
+
     <!-- Strings related to Settings -->
     <string name="movie_api_key_dtn">Empty</string>;
     <!-- Example General settings -->
