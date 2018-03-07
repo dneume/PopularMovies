@@ -1,0 +1,28 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/display_trailer_movie_title"
+    android:layout_width="match_parent"
+    android:layout_height="75dp"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:background="?android:attr/activatedBackgroundIndicator">
+
+    <com.google.android.youtube.player.YouTubeThumbnailView
+        android:id="@+id/thumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/no_thumbnail"
+        android:adjustViewBounds="true"
+        android:scaleType="centerInside"/>
+
+    <TextView
+        android:id="@+id/video_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="5dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimaryDark"/>
+
+</LinearLayout>

@@ -2,7 +2,6 @@ package com.example.android.popularmovies;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,7 @@ import java.util.List;
  * Created by dneum on 1/9/2018.
  */
 
-public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
+public class  MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
 
     private List<MovieDetail> mMovieDetail;
     private Context mContext;
@@ -73,7 +72,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         String mMovie_complete_path = mLocalMovieDetail.movie_complete_path;
         viewHolder.movie_title_TextView.setText(mMovie_title);
 
-        Picasso mPicasso = null;
         Picasso.with(mContext).load(mMovie_complete_path).fit().into(viewHolder.movie_ImageView);
     }
 

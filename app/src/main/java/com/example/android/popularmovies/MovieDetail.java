@@ -1,16 +1,5 @@
 package com.example.android.popularmovies;
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Array;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Scanner;
-
 /**
  * Created by dneum on 1/15/2018.
  */
@@ -24,6 +13,12 @@ public class MovieDetail {
     String move_user_rating;
     String release_date;
     String movie_complete_path;
+    String movie_review[];
+    String movie_trailer_id[];
+    String movie_trailer_name[];
+    // movie_review and movie_trailers are placeholders for an unknown number of reviews and trailers
+    // the assumption is that 20 trailers and 20 movie reviews are plenty
+
 
     public MovieDetail(String id)
     {
@@ -34,9 +29,10 @@ public class MovieDetail {
         this.move_user_rating = "tbd";
         this.release_date = "tbd";
         this.movie_complete_path = "tbd";
+        this.movie_review = new String[21];
+        this.movie_trailer_id = new String[21];
+        this.movie_trailer_name = new String[21];
     }
-
-
 }
 
 

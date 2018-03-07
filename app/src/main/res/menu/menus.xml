@@ -17,7 +17,11 @@
             android:title="HIghest Rated"
             android:checked="false"
             android:id="@+id/highest"
-
+            />
+        <item
+            android:title="Favorites"
+            android:checked="false"
+            android:id="@+id/favorites"
         />
     </group>
 </menu>
