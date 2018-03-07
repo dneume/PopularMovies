@@ -4,8 +4,6 @@
 
     <!-- youtube apikey from google -->
     <!-- the format is key=API_KEY as a paramter -->
-    <string name="you_tube_api_key">AIzaSyCcPI1T7Djz87sWnaFHr9lwzVPEQH9o53Q</string>
-
 
     <!-- Strings related to Settings -->
     <string name="movie_api_key_dtn">Empty</string>;
