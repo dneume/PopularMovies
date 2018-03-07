@@ -49,7 +49,7 @@ import java.util.ListIterator;
 
 public class MovieVideoActivity extends AppCompatActivity implements OnFullscreenListener {
 
-    public static final String DEVELOPER_KEY = "AIzaSyCcPI1T7Djz87sWnaFHr9lwzVPEQH9o53Q";
+    public static final String DEVELOPER_KEY = "";
 
     /** The duration of the animation sliding up the video in portrait. */
     private static final int ANIMATION_DURATION_MILLIS = 300;
