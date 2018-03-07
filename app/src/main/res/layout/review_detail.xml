@@ -77,15 +77,23 @@
         android:textSize="12sp"
         android:visibility="visible" />
 
-    <TextView
-        android:id="@+id/display_web_review"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
+        android:layout_alignLeft="@+id/display_original_movie_title"
+        android:layout_alignStart="@+id/display_original_movie_title"
         android:layout_below="@+id/display_original_movie_title"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:textSize="14sp" />
+        android:layout_marginTop="15dp">
 
+        <TextView
+            android:id="@+id/display_web_review"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/display_original_movie_title"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:textSize="14sp" />
+    </ScrollView>
 </RelativeLayout>

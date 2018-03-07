@@ -72,7 +72,6 @@ public class  MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder>
         String mMovie_complete_path = mLocalMovieDetail.movie_complete_path;
         viewHolder.movie_title_TextView.setText(mMovie_title);
 
-        Picasso mPicasso = null;
         Picasso.with(mContext).load(mMovie_complete_path).fit().into(viewHolder.movie_ImageView);
     }
 

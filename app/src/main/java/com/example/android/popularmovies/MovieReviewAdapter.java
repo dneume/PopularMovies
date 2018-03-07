@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * Created by dneum on 2/4/2018.
@@ -18,13 +17,14 @@ import java.util.ListIterator;
 public class  MovieReviewAdapter extends RecyclerView.Adapter<MovieReviewAdapter.ViewHolder>{
 
     private List<MovieReviewDetail> mMovieReviewDetail;
-    private ListIterator<MovieReviewDetail> mIterateMovieReview;
+    // --Commented out by Inspection (2/13/2018 11:59 AM):private ListIterator<MovieReviewDetail> mIterateMovieReview;
     private Context mContext;
-    private int mNumOfReviews = 0;
+    private  int mNumOfReviews = 0;
+
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-         public TextView title;
-         public TextView reviewCounterView;
+        public TextView title;
+        public TextView reviewCounterView;
         public  TextView webView;
         public  TextView authorView;
 

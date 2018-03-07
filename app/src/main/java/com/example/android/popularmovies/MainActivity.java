@@ -3,8 +3,9 @@ package com.example.android.popularmovies;
 
 import android.content.Intent;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -19,6 +20,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.stetho.Stetho;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -28,12 +31,10 @@ import java.util.ArrayList;
 
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 
+import static com.example.android.popularmovies.MovieFavoritesDb.CONTENT_URI;
 import static com.example.android.popularmovies.Utils.buildUrlForDetail;
-import static com.example.android.popularmovies.Utils.buildUrlForVideos;
 import static com.example.android.popularmovies.Utils.readStream;
 import static com.example.android.popularmovies.Utils.scanInput;
 import static com.example.android.popularmovies.Utils.buildUrlForThumbNailFile;
@@ -47,7 +48,7 @@ public class  MainActivity extends AppCompatActivity {
     private Boolean networkIsAvailable = FALSE;
     private Context context;
     public TextView mSearchResultsTextView;
-    // default the sort option to 0 so that the proper option
+    // default the sort option to null on the first time this is instantiated
     public static String sort_option = null;
 
     public RecyclerView.Adapter recyclerView_Adapter;
@@ -56,6 +57,8 @@ public class  MainActivity extends AppCompatActivity {
 
     public static List<MovieDetail> movies;
     public ListIterator<MovieDetail> mIterator;
+
+    public static SQLiteDatabase db;
 
 
     public class MovieDbQueryTask extends AsyncTask<URL, Void, String> {
@@ -71,17 +74,42 @@ public class  MainActivity extends AppCompatActivity {
             URL searchUrl = params[0];
             String movieDbResults = null;
             URL detailUrl;
-            URL reviewUrl;
-            URL videoUrl;
             MovieDetail mMovieDetail;
             String mMovie_Id;
+            ContentProviderMovieApp cpma;
+            Cursor cursor;
 
             int i = 0;
             Context context = getBaseContext();
-
+            cpma = new ContentProviderMovieApp();
             try {
-                // the buildUrlfor is adding and deleting members
-                movieDbResults = getResponseFromHttpUrl(searchUrl);
+                // check and create the db the first time thru
+                MovieFavoritesDbHelper mDbHelper = new MovieFavoritesDbHelper(getApplicationContext());
+                db = mDbHelper.getWritableDatabase();
+                mDbHelper.onCreate(db);
+
+                //get the proper source for movies list to display
+                if(sort_option == "Favorites") {
+                    Log.d(getLocalClassName(), "switch_favorites");
+                    cpma = new ContentProviderMovieApp();
+                    // return all rows from the database
+                    cursor = cpma.query(CONTENT_URI,null,null,null,null);
+                    cursor.moveToFirst();
+                    while (!cursor.isAfterLast() ){
+                        String local_id = cursor.getString(cursor.getColumnIndex(MovieFavoritesDb.MovieFavoritesColumns.COLUMN_MOVIE_ID));
+                        String movie_title = cursor.getString(cursor.getColumnIndex(MovieFavoritesDb.MovieFavoritesColumns.COLUMN_MOVIE_ORIGINAL_TITLE));
+                        mMovieDetail = new MovieDetail(local_id);
+                        mMovieDetail.movie_original_title = movie_title;
+                        movies.add(mMovieDetail);
+                        cursor.moveToNext();
+                    }
+                    cursor.close();
+                }
+                else {
+                     Log.d(getLocalClassName(),"switch_other");
+                     // the get the json data from the web service
+                     movieDbResults = getResponseFromHttpUrl(searchUrl);
+                }
 
                 mIterator = movies.listIterator(0);
                 while(mIterator.hasNext()){
@@ -89,25 +117,7 @@ public class  MainActivity extends AppCompatActivity {
                     mMovie_Id = mMovieDetail.movie_id;
                     detailUrl = buildUrlForDetail(mMovie_Id,context);
                     getMovieDetail(detailUrl,i,mMovieDetail);
-                    Log.d("List_Movie_id ", mMovieDetail.movie_id + " " + String.valueOf(i) );
-
-//                    //get the list of reviews
-//                    int number_of_reviews = 0;
-//                    reviewUrl = buildUrlForReviews(mMovieDetail.movie_id, context);
-//                    number_of_reviews = getMovieReviews_org(mMovieDetail.movie_review, reviewUrl);
-//                    Log.d("number of reviews", String.valueOf(number_of_reviews));
-
-//                  http 429 is being averted by slowing down the processing
-//                    SystemClock.sleep(400);
-
-                    // get the list of videos
-                    int number_of_videos = 0;
-                    videoUrl = buildUrlForVideos(mMovieDetail.movie_id, context);
-                    number_of_videos = getMovieVideos(mMovieDetail.movie_trailer, videoUrl);
-                    Log.d("number of videos",String.valueOf(number_of_videos));
-
-//                  http 429 is being averted by slowing down the processing
-                    SystemClock.sleep(400);
+                    Log.d(getLocalClassName(), "List_Movie_id: " + mMovieDetail.movie_id + " " + String.valueOf(i) );
 
                     i++;
                 }
@@ -115,7 +125,25 @@ public class  MainActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-              return movieDbResults;
+
+
+
+//            db.execSQL(SQL_DELETE_DB);
+//             if( db != null) {
+//                 Log.d(getLocalClassName(),"calling onDestroy");
+//                 mDbHelper.onDestroy(db);
+//             }
+//            Log.d(getLocalClassName(),db.getPath());
+//            db.execSQL(SQL_CREATE_DB);
+            // Create a new map of values, where column names are the keys
+//            ContentValues values = new ContentValues();
+//            values.put(MovieFavoritesDb.MovieFavoritesColumns.COLUMN_MOVIE_ID, "Movie title");
+//            values.put(MovieFavoritesDb.MovieFavoritesColumns.COLUMN_MOVIE_ORIGINAL_TITLE, "original title");
+//            values.put(MovieFavoritesDb.MovieFavoritesColumns.COLUMN_THUMBNAIL_PATH,"thumbnail path");
+//// Insert the new row, returning the primary key value of the new row
+//            long newRowId = db.insert(MovieFavoritesDb.MovieFavoritesColumns.TABLE_NAME, null, values);
+//            Log.d(getLocalClassName(), Long.toString(newRowId));
+            return movieDbResults;
         }
 
         @Override
@@ -127,13 +155,12 @@ public class  MainActivity extends AppCompatActivity {
             MovieDetail mMovieDetail;
             while(mIterator.hasNext()){
                 mMovieDetail = mIterator.next();
-                Log.d("onPostExecute ", mMovieDetail.movie_id + " " + String.valueOf(i) + mMovieDetail.movie_original_title );
+                Log.d(getLocalClassName(), "onPostExecute " + mMovieDetail.movie_id + " " + String.valueOf(i) + mMovieDetail.movie_original_title );
                 i++;
             }
             showJsonDataView();
-            Log.d("onPost Execute","getting ready to exit");
+            Log.d(getLocalClassName(), "onPost Execute: getting ready to exit");
         }
-
      }
 
     private void showJsonDataView() {
@@ -150,11 +177,11 @@ public class  MainActivity extends AppCompatActivity {
 
         URL url = null;
         Utils utils;
-        RecyclerView.Adapter recyclerView_Adapter;
-        RecyclerView.LayoutManager recyclerView_LayoutManager;
-        RecyclerView recyclerView;
 
         super.onCreate(savedInstanceState);
+
+        Stetho.initializeWithDefaults(this);
+
         setContentView(R.layout.activity_main);
 
         context = getApplicationContext();
@@ -173,18 +200,19 @@ public class  MainActivity extends AppCompatActivity {
         // call this function to build the query to return one page of movies
         // first time thru, the sort_option is set to the default
         //otherwise, the sort_option is a global variable
-        Log.d("OnCreate sort_optionVal", String.valueOf(sort_option));
+        Log.d(getLocalClassName(),"OnCreate sort_optionVal: " + String.valueOf(sort_option));
+
         if(sort_option == null) {
+            Log.d(getLocalClassName(),"sort_option is set to popular");
             sort_option = "Popular";
         }
-        url = Utils.buildUrl(sort_option, context);
-
+        //Menus have not been created yet so tracking the sort option manually
+        if(sort_option != "Favorites") {
+            url = Utils.buildUrl(sort_option, context);
+        }
         //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
         new MovieDbQueryTask().execute(url);
-
-        Log.d("onCreate ", " ");
         if(movies.isEmpty() == FALSE) {
-            Log.d("on create ", " NOT EMPTY" );
             mIterator = movies.listIterator(0);
             int i = 0;
             MovieDetail mMovieDetail;
@@ -197,7 +225,6 @@ public class  MainActivity extends AppCompatActivity {
         else {
             Log.d("on create ", " IS EMPTY" );
         }
-
     }
 
 
@@ -227,7 +254,7 @@ public class  MainActivity extends AppCompatActivity {
                     @Override
                     public void onCustomItemClick(View view, int position) {
 
-                        Log.d("onclick view ", " in main activity " + String.valueOf(position));
+                        Log.d(getLocalClassName(),"onclick view, in main activity " + String.valueOf(position));
                         launchDetailActivity(position);
                     }
                 }
@@ -302,6 +329,11 @@ public class  MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+     }
+
     //pass the url of the movie_id, along with the mMovieDetail instance from the arraylist
     public boolean getMovieDetail(URL url, int i, MovieDetail mMovieDetail) {
 
@@ -358,131 +390,6 @@ public class  MainActivity extends AppCompatActivity {
         return true;
     }
 
-    public int getMovieReviews_org(URL url[],URL urlToTheReviews) throws IOException {
-
-        String local_input = null;
-        String checkForUrl = null;
-        int index = 0;
-        int count = 0;
-        int attempts = 0;
-
-        HttpURLConnection urlConnection = (HttpURLConnection) urlToTheReviews.openConnection();
-
-        if (urlConnection.getResponseCode() != 200) {
-
-            Log.d("urlreview in method", String.valueOf(urlConnection.getResponseCode()) + " " + urlConnection.getResponseMessage());
-            Map<String, List<String>> headers = urlConnection.getHeaderFields();
-            Set<Map.Entry<String, List<String>>> entrySet = headers.entrySet();
-            for (Map.Entry<String, List<String>> entry : entrySet) {
-                String headerName = entry.getKey();
-                if(headerName == null)
-                        headerName = "NULL";
-                Log.d("Header Name:", headerName);
-                List<String> headerValues = entry.getValue();
-                for (String value : headerValues) {
-                    Log.d("Header value:", value);
-                }
-            }
-            urlConnection.disconnect();
-            return urlConnection.getResponseCode();
-        }
-
-
-        try {
-            InputStream in = urlConnection.getInputStream();
-            local_input = readStream(in);
-
-            //scanner for the url string
-            Scanner scanner = new Scanner(local_input);
-            scanner.useDelimiter("\"url\":\"");
-
-            // not all movies have a review so need to check that there is at least one
-            checkForUrl = scanner.findInLine("\"url\":\"");
-            if(checkForUrl == null) {
-                urlConnection.disconnect();
-                return count;
-            }
-
-            // Retrieve each url for the movie review url Array
-             while(scanner.hasNext()) {
-                local_input = scanner.next();
-                index = local_input.indexOf("\"");
-                if (index > 0) {
-                    String local_id = local_input.substring(0, index);
-                    url[count] = new URL(local_id);
-                    count++;
-                }
-            }
-
-        } finally {
-            urlConnection.disconnect();
-        }
-        return count;
-    }
-
-    public int getMovieVideos(String videos[],URL urlToTheVideos) throws IOException {
-
-        String local_input = null;
-        String checkForVideo = null;
-        int index = 0;
-        int count = 0;
-        int attempts = 0;
-
-        HttpURLConnection urlConnection = (HttpURLConnection) urlToTheVideos.openConnection();
-
-        if (urlConnection.getResponseCode() != 200) {
-
-            Log.d("urlreview in method", String.valueOf(urlConnection.getResponseCode()) + " " + urlConnection.getResponseMessage());
-            Map<String, List<String>> headers = urlConnection.getHeaderFields();
-            Set<Map.Entry<String, List<String>>> entrySet = headers.entrySet();
-            for (Map.Entry<String, List<String>> entry : entrySet) {
-                String headerName = entry.getKey();
-                if(headerName == null)
-                    headerName = "NULL";
-                Log.d("Header Name:", headerName);
-                List<String> headerValues = entry.getValue();
-                for (String value : headerValues) {
-                    Log.d("Header value:", value);
-                }
-            }
-            urlConnection.disconnect();
-            return urlConnection.getResponseCode();
-        }
-
-
-        try {
-            InputStream in = urlConnection.getInputStream();
-            local_input = readStream(in);
-
-            //scanner for the url string
-            Scanner scanner = new Scanner(local_input);
-            scanner.useDelimiter("\"name\":\"");
-
-            // not all movies have a review so need to check that there is at least one
-            checkForVideo = scanner.findInLine("\"name\":\"");
-            if(checkForVideo == null) {
-                urlConnection.disconnect();
-                return count;
-            }
-
-            // Retrieve each url for the movie review url Array
-            while(scanner.hasNext()) {
-                local_input = scanner.next();
-                index = local_input.indexOf("\",");
-                if (index > 0) {
-                    String local_buf = local_input.substring(0, index);
-                    String local_id = local_buf.replace("\\","");
-                    videos[count] = local_id;
-                    Log.d("VideoName",local_id);
-                    count++;
-                }
-            }
-
-        } finally {
-            urlConnection.disconnect();
-        }
-        return count;
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -494,7 +401,19 @@ public class  MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu){
-
+        MenuItem menuItem;
+        if(sort_option == "Favorites") {
+            menuItem = menu.findItem(R.id.favorites);
+            menuItem.setChecked(TRUE);
+        }
+        if(sort_option == "Popular") {
+            menuItem = menu.findItem(R.id.popular);
+            menuItem.setChecked(TRUE);
+        }
+        if(sort_option == "Highest") {
+            menuItem = menu.findItem(R.id.highest);
+            menuItem.setChecked(TRUE);
+        }
         return TRUE;
     }
 
@@ -530,6 +449,17 @@ public class  MainActivity extends AppCompatActivity {
                 //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
                 new MovieDbQueryTask().execute(url);
                 return true;
+            case R.id.favorites:
+                menuItem.setChecked(TRUE);
+                if(sort_option == "Favorites")
+                    return true;
+                Toast.makeText(context, "Display list of favorite movies " , Toast.LENGTH_LONG).show();
+                sort_option = "Favorites";
+                // call this function to build the query to return one page of favorite movies
+                url = null;
+                //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
+                new MovieDbQueryTask().execute(url);
+                return true;
         }
 
         return super.onOptionsItemSelected(menuItem);
@@ -561,7 +491,6 @@ public class  MainActivity extends AppCompatActivity {
         startActivity(i);
         return TRUE;
     }
-
 }
 
 

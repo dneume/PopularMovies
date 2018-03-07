@@ -1,0 +1,36 @@
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/container">
+
+    <fragment
+        class="com.example.android.popularmovies.MovieVideoActivity$VideoListFragment"
+        android:id="@+id/video_list_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+
+    <LinearLayout
+            android:id="@+id/video_box"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:orientation="vertical">
+
+        <ImageButton
+            android:id="@+id/close_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:src="@android:drawable/btn_dialog"
+            android:onClick="onClickClose"
+            android:contentDescription="VideoFragmentCloseButton"/>
+
+        <fragment
+            class="com.example.android.popularmovies.MovieVideoActivity$VideoFragment"
+            android:id="@+id/video_container_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+</merge>

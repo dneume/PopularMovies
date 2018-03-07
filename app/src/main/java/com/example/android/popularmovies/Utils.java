@@ -28,7 +28,6 @@ public class Utils {
 
     private final static String BASE_URL =
             "http://api.themoviedb.org/3/movie/";
-    private final static String KEY_SORT = "sort_by";
     private final static String PARAM_POPULAR = "popular";
     private final static String PARAM_HIGHEST = "top_rated";
     private final static String KEY_API = "api_key";
@@ -126,14 +125,13 @@ public class Utils {
         uriBuilder.appendQueryParameter(KEY_API, context.getResources().getString(R.string.movie_api_key_dtn));
         uri = uriBuilder.build();
 
-        String local = uriBuilder.toString();
+//        String local = uriBuilder.toString();
 
         try {
             url = new URL(uri.toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-//        Log.d("Return from reviews url", local);
         return url;
     }
 
@@ -149,14 +147,13 @@ public class Utils {
         uriBuilder.appendQueryParameter(KEY_API, context.getResources().getString(R.string.movie_api_key_dtn));
         uri = uriBuilder.build();
 
-        String local = uriBuilder.toString();
+//        String local = uriBuilder.toString();
 
         try {
             url = new URL(uri.toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        Log.d("Return from videos url", local);
         return url;
     }
 
@@ -184,7 +181,7 @@ public class Utils {
     // read the http input stream into a buffer so that the buffer can be used by multiple scanners
     public static String readStream(InputStream is) {
         try {
-            int backslash = 0;
+            int backslash;
             ByteArrayOutputStream bo = new ByteArrayOutputStream();
             int i = is.read();
             while (i != -1) {

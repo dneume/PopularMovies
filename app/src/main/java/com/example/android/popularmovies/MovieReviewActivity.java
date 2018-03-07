@@ -27,26 +27,27 @@ import static com.example.android.popularmovies.Utils.scanInput;
         public List<MovieReviewDetail> reviewList;
         public ListIterator<MovieReviewDetail> mIterateReview;
         public MovieReviewDetail mRd;
-        public String movie_title;
-        public int total_number_reviews = 0;
+
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
 
             Context mContext;
-            String mMovieId = "MovieReviewDetail";
+            String mIntentId = "MovieReviewDetail";
+            String movie_title = null;
 
             String auth_review_string[] = new String[21];
             int num = 0;
             int index = 0;
             String input = null;
+            int total_number_reviews = 0;
 
             // always execute the next three steps in this order for recyclerview
             super.onCreate(savedInstanceState);
 
             // get the current Intent and retrieve the movie detail
             Intent intent = getIntent();
-            auth_review_string = intent.getStringArrayExtra(mMovieId);
+            auth_review_string = intent.getStringArrayExtra(mIntentId);
 
             // let's set the content view
             setContentView(R.layout.review_recycler_view);
@@ -70,6 +71,7 @@ import static com.example.android.popularmovies.Utils.scanInput;
 
                 // the author of each review is prefixed to the content, so need to pull this off
                 input = auth_review_string[num];
+//                Log.d("scan_input", input);
                 index = input.indexOf("\"");
                 if (index > 0)
                     mRd.movie_review_author = input.substring(0, index);
