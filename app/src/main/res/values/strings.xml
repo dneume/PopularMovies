@@ -9,7 +9,7 @@
 
 
     <!-- Strings related to Settings -->
-    <string name="movie_api_key_dtn">Empty</string>;
+    <string name="movie_api_key_dtn">78891bb3d2c1b1ee69109f6f46b23ead</string>;
     <!-- Example General settings -->
 
     <string name="minVersion"></string>

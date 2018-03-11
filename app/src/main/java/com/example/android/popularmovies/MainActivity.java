@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -50,6 +51,10 @@ public class  MainActivity extends AppCompatActivity {
     public TextView mSearchResultsTextView;
     // default the sort option to null on the first time this is instantiated
     public static String sort_option = null;
+    // use this variable to save the scroll position of the recycler view
+
+    //these next items are needed to scroll to position on an orientation change
+    private Parcelable savedRecyclerLayoutState;
 
     public RecyclerView.Adapter recyclerView_Adapter;
     public RecyclerView.LayoutManager recyclerView_LayoutManager;
@@ -225,26 +230,9 @@ public class  MainActivity extends AppCompatActivity {
         else {
             Log.d("on create ", " IS EMPTY" );
         }
-    }
 
-
-//    @Override
-    public void onItemClick(View view, int position) {
-        Log.d(" main activity ", " onItemClick" + " " + String.valueOf(position));
-    }
-
-
-
-    @Override
-    public void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        //IF the network is not available...do something
-        if(!networkIsAvailable) {
-            Toast.makeText(this, "'Movies to Watch!' requires a network, but one cannot be found!", Toast.LENGTH_LONG).show();
-            Toast.makeText(this, "Try again once a network is available!", Toast.LENGTH_LONG).show();
-            finish();
-        }
-
+        // this is the code to setup the UI. The next 28 lines are required in order to
+        // properly save the grid layout on a screen rotation
         recyclerView = findViewById(R.id.rvImages);
 
         // create the movie adapter and set the custom listener to return the click value
@@ -270,14 +258,37 @@ public class  MainActivity extends AppCompatActivity {
         if (recyclerView_LayoutManager != null) {
             recyclerView.setLayoutManager(recyclerView_LayoutManager);
         }
+        if(savedRecyclerLayoutState != null) {
+            recyclerView_LayoutManager.onRestoreInstanceState(savedRecyclerLayoutState);
+        }
+    }
+
+
+//    @Override
+    public void onItemClick(View view, int position) {
+        Log.d(" main activity ", " onItemClick" + " " + String.valueOf(position));
+    }
+
+
+
+    @Override
+    public void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        //IF the network is not available...do something
+        if(!networkIsAvailable) {
+            Toast.makeText(this, "'Movies to Watch!' requires a network, but one cannot be found!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Try again once a network is available!", Toast.LENGTH_LONG).show();
+            finish();
+        }
     }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         // Save the user's current game state
        savedInstanceState.putString("Sort_option",sort_option);
-       // Always call the superclass so it can save the view hierarchy state
+        // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(savedInstanceState);
+
     }
 
     @Override
@@ -286,8 +297,23 @@ public class  MainActivity extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
         // Restore state members from saved instance
         sort_option = savedInstanceState.getString("Sort_option");
-   }
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        savedRecyclerLayoutState = recyclerView_LayoutManager.onSaveInstanceState();
+        // get the scroll position of recyclerview
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(savedRecyclerLayoutState != null) {
+            recyclerView_LayoutManager.onRestoreInstanceState(savedRecyclerLayoutState);
+        }
+        Log.d(getLocalClassName(),"onResume");
+    }
 
 //     query the database for popular movies, and then scan the stream for every movie_id in order
 //     to save in the arraylist of MovieDetail
@@ -332,6 +358,7 @@ public class  MainActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
+
      }
 
     //pass the url of the movie_id, along with the mMovieDetail instance from the arraylist
