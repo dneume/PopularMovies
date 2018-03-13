@@ -4,10 +4,10 @@
 
     <!-- youtube api_key from google -->
     <!-- the format is key=API_KEY as a paramter -->
-    <string name="you_tube_api_key">AIzaSyCcPI1T7Djz87sWnaFHr9lwzVPEQH9o53Q</string>
+    <string name="you_tube_api_key"></string>
 
     <!-- Strings related to Settings -->
-    <string name="movie_api_key_dtn">78891bb3d2c1b1ee69109f6f46b23ead</string>;
+    <string name="movie_api_key_dtn"></string>;
     <!-- Example General settings -->
 
     <!-- Strings related to tracking progress in AsynchTask -->
