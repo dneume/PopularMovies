@@ -39,7 +39,6 @@ import static java.lang.Boolean.TRUE;
 
 public class DetailActivity extends AppCompatActivity {
 
-
     private String mNumberOfReviews = "0";
     private String mNumberOfVideos = "0";
     private MovieDetail mMovieDetail;

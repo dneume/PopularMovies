@@ -7,7 +7,6 @@ import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerFragment;
 
-import static com.example.android.popularmovies.MovieVideoActivity.DEVELOPER_KEY;
 
 public final class  DetailVideoFragment extends YouTubePlayerFragment
         implements YouTubePlayer.OnInitializedListener {
@@ -22,7 +21,7 @@ public final class  DetailVideoFragment extends YouTubePlayerFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initialize(DEVELOPER_KEY, this);
+        initialize(String.valueOf(R.string.you_tube_api_key), this);
     }
 
     @Override
