@@ -2,15 +2,23 @@
     <string name="app_name">Movies to Watch!</string>
     <string name="title_activity_display_movie_detail">Movie Details</string>
 
-    <!-- youtube apikey from google -->
+    <!-- youtube api_key from google -->
     <!-- the format is key=API_KEY as a paramter -->
-
-    <string name="you_tube_api_key"></string>
-
+    <string name="you_tube_api_key">AIzaSyCcPI1T7Djz87sWnaFHr9lwzVPEQH9o53Q</string>
 
     <!-- Strings related to Settings -->
     <string name="movie_api_key_dtn">78891bb3d2c1b1ee69109f6f46b23ead</string>;
     <!-- Example General settings -->
+
+    <!-- Strings related to tracking progress in AsynchTask -->
+    <string name="CreateMovieFavoriteDbHelper">CreateMovieFavoriteDbHelper</string>
+    <string name="CreateContentProvider">CreateContentProvider</string>
+    <string name="CreateCursorForContentProvider">CreateCursorForContentProvider</string>
+    <string name="CreateListOfFavoriteMovies">CreateListOfFavoriteMovies</string>
+    <string name="CreateListOfMovies">CreateListOfMovies</string>
+    <string name="IterateThroughListOfMovies">IterateThroughListOfMovies</string>
+    <string name="DoInBackGroundCompleted">DoInBackGroundCompleted</string>
+    <string name="PostExecuteCompleted">PostExecuteCompleted</string>
 
     <string name="minVersion"></string>
     <string name="isLaunchableActivity"></string>

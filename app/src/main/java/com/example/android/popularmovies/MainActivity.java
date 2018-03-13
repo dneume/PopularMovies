@@ -13,6 +13,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.content.Context;
 
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import android.view.Menu;
@@ -53,8 +54,11 @@ public class  MainActivity extends AppCompatActivity {
     public static String sort_option = null;
     // use this variable to save the scroll position of the recycler view
 
-    //these next items are needed to scroll to position on an orientation change
+    //this item is needed to scroll to position on an orientation change
     private Parcelable savedRecyclerLayoutState;
+
+    //this is needed to report progress to the ui thread
+    public static Integer mProgress;
 
     public RecyclerView.Adapter recyclerView_Adapter;
     public RecyclerView.LayoutManager recyclerView_LayoutManager;
@@ -64,9 +68,10 @@ public class  MainActivity extends AppCompatActivity {
     public ListIterator<MovieDetail> mIterator;
 
     public static SQLiteDatabase db;
+    public static MovieFavoritesDb mMovieFavoritesDb;
 
 
-    public class MovieDbQueryTask extends AsyncTask<URL, Void, String> {
+    public class MovieDbQueryTask extends AsyncTask<URL, Integer, String> {
 
         @Override
         protected void onPreExecute() {
@@ -87,18 +92,29 @@ public class  MainActivity extends AppCompatActivity {
             int i = 0;
             Context context = getBaseContext();
             cpma = new ContentProviderMovieApp();
+
             try {
                 // check and create the db the first time thru
+                mProgress = R.string.CreateMovieFavoriteDbHelper;
+                publishProgress(mProgress);
                 MovieFavoritesDbHelper mDbHelper = new MovieFavoritesDbHelper(getApplicationContext());
                 db = mDbHelper.getWritableDatabase();
                 mDbHelper.onCreate(db);
 
                 //get the proper source for movies list to display
                 if(sort_option == "Favorites") {
+                    mProgress = R.string.CreateContentProvider;
+                    publishProgress(mProgress);
                     Log.d(getLocalClassName(), "switch_favorites");
-                    cpma = new ContentProviderMovieApp();
+//                    cpma = new ContentProviderMovieApp();
+
                     // return all rows from the database
+                    mProgress = R.string.CreateCursorForContentProvider;
+                    publishProgress(mProgress);
                     cursor = cpma.query(CONTENT_URI,null,null,null,null);
+
+                    mProgress = R.string.CreateListOfFavoriteMovies;
+                    publishProgress(mProgress);
                     cursor.moveToFirst();
                     while (!cursor.isAfterLast() ){
                         String local_id = cursor.getString(cursor.getColumnIndex(MovieFavoritesDb.MovieFavoritesColumns.COLUMN_MOVIE_ID));
@@ -111,11 +127,15 @@ public class  MainActivity extends AppCompatActivity {
                     cursor.close();
                 }
                 else {
+                    mProgress = R.string.CreateListOfMovies;
+                    publishProgress(mProgress);
                      Log.d(getLocalClassName(),"switch_other");
                      // the get the json data from the web service
                      movieDbResults = getResponseFromHttpUrl(searchUrl);
                 }
 
+                mProgress = R.string.IterateThroughListOfMovies;
+                publishProgress(mProgress);
                 mIterator = movies.listIterator(0);
                 while(mIterator.hasNext()){
                     mMovieDetail = mIterator.next();
@@ -130,24 +150,8 @@ public class  MainActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
-
-//            db.execSQL(SQL_DELETE_DB);
-//             if( db != null) {
-//                 Log.d(getLocalClassName(),"calling onDestroy");
-//                 mDbHelper.onDestroy(db);
-//             }
-//            Log.d(getLocalClassName(),db.getPath());
-//            db.execSQL(SQL_CREATE_DB);
-            // Create a new map of values, where column names are the keys
-//            ContentValues values = new ContentValues();
-//            values.put(MovieFavoritesDb.MovieFavoritesColumns.COLUMN_MOVIE_ID, "Movie title");
-//            values.put(MovieFavoritesDb.MovieFavoritesColumns.COLUMN_MOVIE_ORIGINAL_TITLE, "original title");
-//            values.put(MovieFavoritesDb.MovieFavoritesColumns.COLUMN_THUMBNAIL_PATH,"thumbnail path");
-//// Insert the new row, returning the primary key value of the new row
-//            long newRowId = db.insert(MovieFavoritesDb.MovieFavoritesColumns.TABLE_NAME, null, values);
-//            Log.d(getLocalClassName(), Long.toString(newRowId));
+            mProgress = R.string.DoInBackGroundCompleted;
+            publishProgress(mProgress);
             return movieDbResults;
         }
 
@@ -164,7 +168,8 @@ public class  MainActivity extends AppCompatActivity {
                 i++;
             }
             showJsonDataView();
-            Log.d(getLocalClassName(), "onPost Execute: getting ready to exit");
+            mProgress = R.string.PostExecuteCompleted;
+            Log.d(getLocalClassName(), "onPostExit");
         }
      }
 
@@ -217,6 +222,7 @@ public class  MainActivity extends AppCompatActivity {
         }
         //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
         new MovieDbQueryTask().execute(url);
+
         if(movies.isEmpty() == FALSE) {
             mIterator = movies.listIterator(0);
             int i = 0;
@@ -253,7 +259,7 @@ public class  MainActivity extends AppCompatActivity {
             recyclerView.setVisibility(View.INVISIBLE);
         }
 
-        int numberOfColumns = 2;
+        int numberOfColumns = calculateNnumberOfColumns();
         recyclerView_LayoutManager = new GridLayoutManager(context, numberOfColumns);
         if (recyclerView_LayoutManager != null) {
             recyclerView.setLayoutManager(recyclerView_LayoutManager);
@@ -263,12 +269,21 @@ public class  MainActivity extends AppCompatActivity {
         }
     }
 
+    private int calculateNnumberOfColumns() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        // You can change this divider to adjust the size of the poster
+        int widthDivider = 600;
+        int width = displayMetrics.widthPixels;
+        int nColumns = width / widthDivider;
+        if (nColumns < 2) return 2; //to keep the grid aspect
+        return nColumns;
+    }
 
 //    @Override
     public void onItemClick(View view, int position) {
         Log.d(" main activity ", " onItemClick" + " " + String.valueOf(position));
     }
-
 
 
     @Override
@@ -320,8 +335,8 @@ public class  MainActivity extends AppCompatActivity {
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         Log.d("getResponseFromHttpUrl",url.toString());
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        String local_input = null;
-        int index = 0;
+        String local_input;
+        int index;
         int count = 0;
         MovieDetail mMovieDetail;
 
@@ -364,10 +379,10 @@ public class  MainActivity extends AppCompatActivity {
     //pass the url of the movie_id, along with the mMovieDetail instance from the arraylist
     public boolean getMovieDetail(URL url, int i, MovieDetail mMovieDetail) {
 
-        HttpURLConnection urlConnection = null;
-        String local_input = null;
-        String copy_of_local_input = null;
-        URL mUrl = null;
+        HttpURLConnection urlConnection;
+        String local_input;
+        String copy_of_local_input;
+        URL mUrl;
 
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -450,42 +465,60 @@ public class  MainActivity extends AppCompatActivity {
         int id_of_item_checked = menuItem.getItemId();
         URL url;
 
+
         switch (id_of_item_checked){
             case R.id.popular:
                 // checkable behavior is single so no need to uncheck the other menu item
-                menuItem.setChecked(TRUE);
                 if(sort_option == "Popular")
                         return true;
-                Toast.makeText(context,  "Display list of popular movies " , Toast.LENGTH_LONG).show();
+                if(mProgress == R.string.PostExecuteCompleted) {
+                    menuItem.setChecked(TRUE);
+                    Toast.makeText(context, "Display list of popular movies ", Toast.LENGTH_LONG).show();
 
-                sort_option = "Popular";
-                // call this function to build the query to return one page of movies
-                url = Utils.buildUrl(sort_option,context);
-                //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
-                new MovieDbQueryTask().execute(url);
+                    sort_option = "Popular";
+                    // call this function to build the query to return one page of movies
+                    url = Utils.buildUrl(sort_option, context);
+                    //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
+                    new MovieDbQueryTask().execute(url);
+                } else
+                    Toast.makeText(context, "There is a problem - pick Popular again.", Toast.LENGTH_LONG).show();
+
                 return true;
             case R.id.highest:
-                menuItem.setChecked(TRUE);
+                Log.d(this.getLocalClassName(), "onOptionsItemSelected: " + mProgress + " " + String.valueOf(R.string.PostExecuteCompleted));
+
                 if(sort_option == "Highest")
                     return true;
-                Toast.makeText(context, "Display list of highest rated movies " , Toast.LENGTH_LONG).show();
-                sort_option = "Highest";
+                if(mProgress == R.string.PostExecuteCompleted) {
+                    menuItem.setChecked(TRUE);
+                    Log.d(this.getLocalClassName(), "onOptionsItemSelectedHighest : " + mProgress);
 
-                // call this function to build the query to return one page of movies
-                url = Utils.buildUrl(sort_option,context);
-                //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
-                new MovieDbQueryTask().execute(url);
+                    Toast.makeText(context, "Display list of highest rated movies ", Toast.LENGTH_LONG).show();
+                    sort_option = "Highest";
+
+                    // call this function to build the query to return one page of movies
+                    url = Utils.buildUrl(sort_option, context);
+                    //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
+                    new MovieDbQueryTask().execute(url);
+                } else
+                    Toast.makeText(context, "There is a problem - pick Highest Rated again.", Toast.LENGTH_LONG).show();
+
                 return true;
+
             case R.id.favorites:
-                menuItem.setChecked(TRUE);
                 if(sort_option == "Favorites")
                     return true;
-                Toast.makeText(context, "Display list of favorite movies " , Toast.LENGTH_LONG).show();
-                sort_option = "Favorites";
-                // call this function to build the query to return one page of favorite movies
-                url = null;
-                //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
-                new MovieDbQueryTask().execute(url);
+                if(mProgress == R.string.PostExecuteCompleted) {
+                    menuItem.setChecked(TRUE);
+                    Toast.makeText(context, "Display list of favorite movies ", Toast.LENGTH_LONG).show();
+                    sort_option = "Favorites";
+                    // call this function to build the query to return one page of favorite movies
+                    url = null;
+                    //Execute the MovieDbQuery by instantiating the MovieDbQueryTask
+                    new MovieDbQueryTask().execute(url);
+                } else
+                    Toast.makeText(context, "There is a problem - pick Favorites again.", Toast.LENGTH_LONG).show();
+
                 return true;
         }
 

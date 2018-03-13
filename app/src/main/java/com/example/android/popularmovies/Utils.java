@@ -147,8 +147,6 @@ public class Utils {
         uriBuilder.appendQueryParameter(KEY_API, context.getResources().getString(R.string.movie_api_key_dtn));
         uri = uriBuilder.build();
 
-//        String local = uriBuilder.toString();
-
         try {
             url = new URL(uri.toString());
         } catch (MalformedURLException e) {

@@ -14,9 +14,7 @@ import com.google.android.youtube.player.YouTubeThumbnailView;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.ListFragment;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -41,7 +39,6 @@ import java.util.Map;
 
 import android.support.v7.app.AppCompatActivity;
 
-import java.util.ListIterator;
 
 /**
  * Created by dneum on 2/9/2018.
@@ -49,7 +46,7 @@ import java.util.ListIterator;
 
 public class MovieVideoActivity extends AppCompatActivity implements OnFullscreenListener {
 
-    public static final String DEVELOPER_KEY = "";
+//    public static final String DEVELOPER_KEY = "AIzaSyCcPI1T7Djz87sWnaFHr9lwzVPEQH9o53Q";
 
     /** The duration of the animation sliding up the video in portrait. */
     private static final int ANIMATION_DURATION_MILLIS = 300;
@@ -257,7 +254,6 @@ public class MovieVideoActivity extends AppCompatActivity implements OnFullscree
          */
         public static final class VideoListFragment extends ListFragment {
 
-//            private List<VideoEntry> VIDEO_LIST;
             private PageAdapter adapter;
             private View videoBox;
 
@@ -378,7 +374,7 @@ public class MovieVideoActivity extends AppCompatActivity implements OnFullscree
                     view = inflater.inflate(R.layout.video_list_thumbnail, parent, false);
                     YouTubeThumbnailView thumbnail = view.findViewById(R.id.thumbnail);
                     thumbnail.setTag(entry.videoId);
-                    thumbnail.initialize(DEVELOPER_KEY, thumbnailListener);
+                    thumbnail.initialize(String.valueOf(R.string.you_tube_api_key), thumbnailListener);
                 } else {
                     YouTubeThumbnailView thumbnail = view.findViewById(R.id.thumbnail);
                     YouTubeThumbnailLoader loader = thumbnailViewToLoaderMap.get(thumbnail);
@@ -451,7 +447,7 @@ public class MovieVideoActivity extends AppCompatActivity implements OnFullscree
             @Override
             public void onCreate(Bundle savedInstanceState) {
                 super.onCreate(savedInstanceState);
-                initialize(DEVELOPER_KEY, this);
+                initialize(String.valueOf(R.string.you_tube_api_key), this);
             }
 
             @Override
